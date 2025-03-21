@@ -17,7 +17,7 @@ import { usePrivy } from "@privy-io/react-auth";
 const items = [
   {
     title: "Tokens",
-    url: "#",
+    url: "tokens",
     icon: Coins,
   },
   {
