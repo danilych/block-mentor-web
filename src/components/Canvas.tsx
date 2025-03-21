@@ -32,8 +32,8 @@ const ParticleEffect: React.FC = () => {
       particleColor: "rgba(255,255,255)",
       lineColor: "rgba(0,181,255)",
       particleAmount: 60,
-      defaultRadius: 2,
-      variantRadius: 2,
+      defaultRadius: 1,
+      variantRadius: 1,
       defaultSpeed: 1,
       variantSpeed: 1,
       linkRadius: 300,
@@ -156,7 +156,10 @@ const ParticleEffect: React.FC = () => {
   }, []);
 
   return (
-    <canvas ref={canvasRef} className="fixed bg-neutral-800 inset-0 z-[-10]" />
+    <canvas
+      ref={canvasRef}
+      className="fixed bg-neutral-800 blur-[2px] scale-125 inset-0 z-[-10]"
+    />
   );
 };
 
