@@ -1,4 +1,3 @@
-import "./App.css";
 import { usePrivy } from "@privy-io/react-auth";
 
 function App() {
