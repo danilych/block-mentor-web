@@ -4,6 +4,8 @@ import "./index.css";
 import App from "./App.tsx";
 import { PrivyProvider } from "@privy-io/react-auth";
 
+import { logo } from "./assets/index.ts";
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <PrivyProvider
@@ -12,7 +14,7 @@ createRoot(document.getElementById("root")!).render(
         appearance: {
           theme: "light",
           accentColor: "#676FFF",
-          logo: "https://your-logo-url",
+          logo: logo,
         },
         embeddedWallets: {
           createOnLogin: "all-users",
