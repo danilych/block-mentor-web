@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { EChatMessageRole, TChatMessage } from "@/types/aiChats";
 import { usePrivy } from "@privy-io/react-auth";
 import $client from "@/service/client";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Chat = () => {
   const [messages, setMessages] = useState<TChatMessage[]>([]);
@@ -139,11 +140,12 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col h-[90%]">
+    <div className="flex flex-col h-[90%] lg:w-full lg:justify-center lg:items-center">
+      <ScrollArea className="h-full">
       <div 
         ref={chatContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-4 w-full"
+        className="flex-1  p-4"
       >
         {messages.map((message) => (
           <Message key={message.id} message={message} />
@@ -153,6 +155,7 @@ const Chat = () => {
         )}
         <div ref={bottomOfChatRef} />
       </div>
+        </ScrollArea>
       <div className="absolute bottom-0 left-0 w-full border-t md:border-t-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:bg-vert-light-gradient bg-white dark:bg-gray-800 md:!bg-transparent dark:md:bg-vert-dark-gradient pt-2">
         <div
           className="stretch mx-2 flex flex-row gap-3 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl"
