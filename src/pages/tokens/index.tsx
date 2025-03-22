@@ -51,7 +51,7 @@ const TokensPage = () => {
           name: token.name,
           symbol: token.ticker,
           createdAt: new Date(parseInt(token.blockTimestamp) * 1000).toLocaleDateString(),
-          initialSupply: formatEther(token.initialAmount),
+          initialSupply: formatEther(token.initialAmount).replace(/\.0+$/, ''),
           contractAddress: token.token_address
         }));
         setTokens(formattedTokens);
