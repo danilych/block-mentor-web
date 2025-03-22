@@ -1,26 +1,25 @@
 export enum EChatMessageRole {
   USER = 'USER',
-  AI = 'AGENT'
+  AI = 'AGENT',
 }
 
 export type TChatMessage = {
-  senderType: EChatMessageRole;
-  content: string;
-  id: string;
-  createdAt: number;
-  chunks?: string[];
-  role: EChatMessageRole;
-};
+  prompt: string
+  role: EChatMessageRole
+  id: string
+  createdAt?: number
+  chunks?: string[]
+}
 
 export type TAiChat = {
-  id: string;
-  title: string;
-  messages: TChatMessage[];
-  agentId: string;
-};
+  id: string
+  title: string
+  messages: TChatMessage[]
+  agentId: string
+}
 
 export type AiChatsState = {
-  selectedChat: TAiChat | null;
-  isBotTyping: boolean;
-  showEmptyChat: boolean;
-};
+  selectedChat: TAiChat | null
+  isBotTyping: boolean
+  showEmptyChat: boolean
+}
