@@ -27,7 +27,7 @@ createRoot(document.getElementById("root")!).render(
     >
       <SidebarProvider>
         <AppSidebar />
-        <SidebarTrigger />
+        <SidebarTrigger className="absolute lg:top-0 right-0 z-10 md:static" />
         <App />
       </SidebarProvider>
     </PrivyProvider>
