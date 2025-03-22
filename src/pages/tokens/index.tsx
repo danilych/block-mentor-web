@@ -3,6 +3,7 @@ import { Input } from "../../components/ui/input";
 import {useWallets} from '@privy-io/react-auth';
 import { formatEther } from "ethers";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { API_BASE_URL } from "@/config";
 
 interface Token {
   name: string;
@@ -41,8 +42,9 @@ const TokensPage = () => {
       
       setIsLoading(true);
       setError(null);
+      console.log(embeddedWallet.address);
       try {
-        const response = await fetch(`https://api-production-a609.up.railway.app/api/user/tokens/0x25Fbb765998134400f6e2D4191e89C37dB40fa98`);
+        const response = await fetch(`${API_BASE_URL}/user/tokens/${embeddedWallet.address}`);
         if (!response.ok) {
           throw new Error('Failed to fetch tokens');
         }
