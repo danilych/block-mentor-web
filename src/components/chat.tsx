@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { EChatMessageRole, TChatMessage } from "@/types/aiChats";
 import { usePrivy } from "@privy-io/react-auth";
 import $client from "@/service/client";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Chat = ({user}: {user: any}) => {
   const [messages, setMessages] = useState<TChatMessage[]>([]);
@@ -131,6 +132,7 @@ const Chat = ({user}: {user: any}) => {
     <div className="flex max-w-full flex-1 flex-col">
       <div className="relative h-full w-full transition-width flex flex-col overflow-hidden items-stretch flex-1">
         <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
           <div className="react-scroll-to-bottom--css-ikyem-79elbk h-full">
             <div className="react-scroll-to-bottom--css-ikyem-1n7m0yu">
               {messages && messages.length > 0 ? (
@@ -150,6 +152,7 @@ const Chat = ({user}: {user: any}) => {
               )}
             </div>
           </div>
+        </ScrollArea>
         </div>
         <div className="absolute bottom-0 left-0 w-full border-t md:border-t-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:bg-vert-light-gradient bg-white dark:bg-gray-800 md:!bg-transparent dark:md:bg-vert-dark-gradient pt-2">
           <div
