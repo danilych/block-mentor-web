@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { EChatMessageRole, TChatMessage } from "@/types/aiChats";
 import { usePrivy } from "@privy-io/react-auth";
 import $client from "@/service/client";
+import { API_BASE_URL } from "@/config";
 
 const Chat = () => {
   const [messages, setMessages] = useState<TChatMessage[]>([]);
@@ -52,7 +53,7 @@ const Chat = () => {
 // TODO: get chat with messages
     try {
       const token = await getAccessToken();
-      const response = await fetch("https://api-production-a609.up.railway.app/api/messages", {
+      const response = await fetch(`${API_BASE_URL}/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
