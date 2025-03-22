@@ -184,14 +184,14 @@ const Chat = () => {
                   tabIndex={0}
                   rows={1}
                   placeholder="Send a message..."
-                  className="m-0 w-full resize-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent pl-2 md:pl-0"
+                  className="m-0 w-full outline-none resize-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent pl-2 md:pl-0"
                   style={{
                     maxHeight: "200px",
                     height: "24px",
                     overflowY: "hidden"
                   }}
                   onKeyDown={handleKeypress}
-                ></textarea>
+                />
                 <Button
                   disabled={isBotTyping || message?.length === 0}
                   onClick={() => sendMessage(EChatMessageRole.USER, message)}
