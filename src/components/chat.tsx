@@ -155,9 +155,7 @@ const Chat = () => {
                   <div className="flex items-center justify-center gap-2">
                     <div className="relative w-full md:w-1/2 lg:w-1/3 xl:w-1/4"></div>
                   </div>
-                  <h1 className="text-2xl font-semibold text-center mt-6">
-                    How can I help you today?
-                  </h1>
+  
                 </div>
               ) : null}
               {isBotTyping && (
