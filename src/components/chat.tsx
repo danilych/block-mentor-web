@@ -158,7 +158,7 @@ const Chat = ({user}: {user: any}) => {
             <div className="relative flex h-full flex-1 md:flex-col">
               <div className="flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]">
                 <textarea
-                  // onChange={(e) => setMessage(e.target.value)}
+                  disabled={isBotTyping}
                   ref={textareaRef}
                   tabIndex={0}
                   rows={1}
@@ -170,7 +170,6 @@ const Chat = ({user}: {user: any}) => {
                     overflowY: "hidden"
                   }}
                   onKeyDown={handleKeypress}
-                 
                 />
                 <Button
                   disabled={isBotTyping}
