@@ -20,7 +20,6 @@ const App = () => {
 
     if (data) {
       setUser(data)
-      console.log(data)
 
       delegateWallet({
         address: data.user.wallet,

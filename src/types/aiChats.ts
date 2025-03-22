@@ -1,6 +1,7 @@
 export enum EChatMessageRole {
-  USER = 'USER',
-  AI = 'AGENT',
+  USER = 'user',
+  AI = 'assistant',
+  SYSTEM = 'system',
 }
 
 export type TChatMessage = {
