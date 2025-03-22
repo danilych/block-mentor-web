@@ -10,7 +10,7 @@ function Login() {
     return <div>Loading...</div>;
   }
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center">
       <h2 className="scroll-m-20 text-white pb-2 text-3xl font-semibold tracking-tight first:mt-0">
         Welcome
       </h2>
