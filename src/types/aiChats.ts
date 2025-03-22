@@ -1,6 +1,6 @@
 export enum EChatMessageRole {
-  USER = 'user',
-  AI = 'assistant'
+  USER = 'USER',
+  AI = 'AGENT'
 }
 
 export type TChatMessage = {
@@ -23,8 +23,4 @@ export type AiChatsState = {
   selectedChat: TAiChat | null;
   isBotTyping: boolean;
   showEmptyChat: boolean;
-  avalableAgent: {
-    id: string;
-    name: string;
-  } | null;
 };

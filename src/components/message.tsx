@@ -4,14 +4,14 @@
 
 interface MessageProps {
   message: {
-    role: 'user' | 'assistant';
+    role: 'USER' | 'AGENT';
     content: string | null;
   };
 }
 
 const Message = ({ message }: MessageProps) => {
   const { role, content: text } = message;
-  const isUser = role === "user";
+  const isUser = role === "USER";
 
   return (
     <div

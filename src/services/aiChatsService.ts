@@ -20,6 +20,7 @@ class AiChatsService {
       id: uuidv4(),
       content: message,
       senderType: EChatMessageRole.USER,
+      role: EChatMessageRole.USER,
       createdAt: Date.now()
     };
     
@@ -45,6 +46,7 @@ class AiChatsService {
       id: uuidv4(),
       content: message,
       senderType: EChatMessageRole.AI,
+      role: EChatMessageRole.AI,
       createdAt: Date.now()
     };
     
