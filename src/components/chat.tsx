@@ -98,13 +98,13 @@ const Chat = ({ user }: { user: any }) => {
           .map(line => line.replace('data: ', ''))
 
         cleanedMessages.forEach(chunk => {
-          if (previousChunk && /^[a-zA-Z]/.test(chunk)) {
-            resultString += ' ' + chunk
+          if (previousChunk && (previousChunk.match(/[a-zA-Z0-9]$/) || chunk.match(/^[a-zA-Z0-9]/))) {
+            resultString += ' ' + chunk;
           } else {
-            resultString += chunk
-          }
-          previousChunk = chunk
-        })
+            resultString += chunk;
+            }
+            previousChunk = chunk;
+          });
 
         // Update AI message content **incrementally**
         setMessages((prevMessages: TChatMessage[]) =>
