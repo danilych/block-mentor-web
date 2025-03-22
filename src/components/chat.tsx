@@ -2,11 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import Message from "@/components/message";
 import { Button } from "@/components/ui/button";
 
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string | "...";
+}
+
+interface ApiResponse {
+  message: string;
+  status: number;
+}
+
 const Chat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showEmptyChat, setShowEmptyChat] = useState(true);
-  const [conversation, setConversation] = useState<any[]>([]);
+  const [conversation, setConversation] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState("");
   const bottomOfChatRef = useRef<HTMLDivElement>(null);
 
@@ -16,25 +26,27 @@ const Chat = () => {
     }
   }, [conversation]);
 
-  const sendMessage = async (e: any) => {
-    e.preventDefault();
+  const sendMessage = async (e?: React.FormEvent | React.MouseEvent | React.KeyboardEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (message.length < 1) {
       setErrorMessage("Please enter a message.");
       return;
     } else {
       setErrorMessage("");
     }
+
+    const userMessage: ChatMessage = { content: message, role: "user" };
+    const pendingMessage: ChatMessage = { content: "...", role: "assistant" };
+    
     setIsLoading(true);
-    setConversation([
-      ...conversation,
-      { content: message, role: "user" },
-      { content: null, role: "system" },
-    ]);
+    setConversation([...conversation, userMessage, pendingMessage]);
     setMessage("");
     setShowEmptyChat(false);
 
     try {
-      const response = await fetch(`/api/openai`, {
+      const response = await fetch("/api/openai", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,34 +57,32 @@ const Chat = () => {
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      const data: ApiResponse = await response.json();
 
-        // Add the message to the conversation
-        setConversation([
-          ...conversation,
-          { content: message, role: "user" },
-          { content: data.message, role: "system" },
-        ]);
+      if (response.ok) {
+        const assistantMessage: ChatMessage = { content: data.message, role: "assistant" };
+        setConversation([...conversation, userMessage, assistantMessage]);
       } else {
         console.error(response);
         setErrorMessage(response.statusText);
       }
-
-      setIsLoading(false);
-    } catch (error: any) {
-      console.error(error);
-      setErrorMessage(error.message);
-
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error:", error);
+        setErrorMessage(error.message);
+      } else {
+        console.error("Unknown error:", error);
+        setErrorMessage("An unexpected error occurred");
+      }
+    } finally {
       setIsLoading(false);
     }
   };
 
-  const handleKeypress = (e: any) => {
+  const handleKeypress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // It's triggers by pressing the enter key
-    if (e.keyCode == 13 && !e.shiftKey) {
+    if (e.keyCode === 13 && !e.shiftKey) {
       sendMessage(e);
-      e.preventDefault();
     }
   };
 

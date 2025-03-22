@@ -2,10 +2,15 @@
 // import { HiUser } from "react-icons/hi";
 // import { TbCursorText } from "react-icons/tb";
 
-const Message = (props: any) => {
-  const { message } = props;
-  const { role, content: text } = message;
+interface MessageProps {
+  message: {
+    role: 'user' | 'assistant';
+    content: string | null;
+  };
+}
 
+const Message = ({ message }: MessageProps) => {
+  const { role, content: text } = message;
   const isUser = role === "user";
 
   return (
