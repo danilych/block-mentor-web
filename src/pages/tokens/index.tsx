@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "../../components/ui/input";
 import {useWallets} from '@privy-io/react-auth';
 import { formatEther } from "ethers";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, CircleX } from "lucide-react";
 import { API_BASE_URL } from "@/config";
 
 interface Token {
@@ -42,9 +42,12 @@ const TokensPage = () => {
       
       setIsLoading(true);
       setError(null);
-      console.log(embeddedWallet.address);
       try {
         const response = await fetch(`${API_BASE_URL}/user/tokens/${embeddedWallet.address}`);
+        if(response.status === 404) {
+          setTokens([]);
+          return;
+        }
         if (!response.ok) {
           throw new Error('Failed to fetch tokens');
         }
@@ -92,8 +95,16 @@ const TokensPage = () => {
 
   if (tokens.length === 0 && !error) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
-        <div className="text-lg">No tokens found</div>
+      <div className="w-full h-full p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <h1 className="text-xl md:text-2xl font-bold text-white">Tokens</h1>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4 p-8 border rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+          <CircleX />
+          </div>
+          <div className="text-xl font-semibold text-center">No tokens found</div>
+        </div>
       </div>
     );
   }
@@ -124,62 +135,70 @@ const TokensPage = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredTokens.map((token) => (
-                <>
-                  <tr 
-                    key={token.contractAddress} 
-                    onClick={() => setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress)}
-                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
-                  >
-                    <td className="px-4 md:px-6 py-4 min-w-0">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-200 rounded-full flex-shrink-0"></div>
-                        <div className="min-w-0">
-                          <div className="font-medium truncate">{token.name}</div>
-                          <div className="text-gray-500 truncate">{token.symbol}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 md:px-6 py-4 min-w-0">
-                      <span className="font-mono text-xs md:text-sm truncate block">
-                        {token.contractAddress}
-                      </span>
-                    </td>
-                    <td className="px-4 md:px-6 py-4 text-right">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress);
-                        }}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded inline-flex"
-                        aria-label={expandedRow === token.contractAddress ? "Collapse" : "Expand"}
-                      >
-                        {expandedRow === token.contractAddress ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </button>
-                    </td>
-                  </tr>
-                  {expandedRow === token.contractAddress && (
-                    <tr className="bg-gray-50 dark:bg-gray-900">
-                      <td colSpan={3} className="px-4 md:px-6 py-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <div className="text-sm font-medium text-gray-500">Created At</div>
-                            <div className="mt-1">{token.createdAt}</div>
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-gray-500">Initial Supply</div>
-                            <div className="mt-1">{token.initialSupply}</div>
+              {filteredTokens.length > 0 ? (
+                filteredTokens.map((token) => (
+                  <>
+                    <tr 
+                      key={token.contractAddress} 
+                      onClick={() => setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress)}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
+                    >
+                      <td className="px-4 md:px-6 py-4 min-w-0">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-200 rounded-full flex-shrink-0"></div>
+                          <div className="min-w-0">
+                            <div className="font-medium truncate">{token.name}</div>
+                            <div className="text-gray-500 truncate">{token.symbol}</div>
                           </div>
                         </div>
                       </td>
+                      <td className="px-4 md:px-6 py-4 min-w-0">
+                        <span className="font-mono text-xs md:text-sm truncate block">
+                          {token.contractAddress}
+                        </span>
+                      </td>
+                      <td className="px-4 md:px-6 py-4 text-right">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress);
+                          }}
+                          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded inline-flex"
+                          aria-label={expandedRow === token.contractAddress ? "Collapse" : "Expand"}
+                        >
+                          {expandedRow === token.contractAddress ? (
+                            <ChevronUp className="w-4 h-4" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4" />
+                          )}
+                        </button>
+                      </td>
                     </tr>
-                  )}
-                </>
-              ))}
+                    {expandedRow === token.contractAddress && (
+                      <tr className="bg-gray-50 dark:bg-gray-900">
+                        <td colSpan={3} className="px-4 md:px-6 py-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <div className="text-sm font-medium text-gray-500">Created At</div>
+                              <div className="mt-1">{token.createdAt}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-gray-500">Initial Supply</div>
+                              <div className="mt-1">{token.initialSupply}</div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="px-4 md:px-6 py-4 text-center">
+                    <div className="text-lg">No tokens found</div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
