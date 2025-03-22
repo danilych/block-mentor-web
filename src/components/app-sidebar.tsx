@@ -1,4 +1,4 @@
-import { CircleDollarSign, Layers, Coins } from "lucide-react";
+import { CircleDollarSign, Layers, Coins, Bot } from "lucide-react";
 
 import {
   Sidebar,
@@ -15,6 +15,11 @@ import { Button } from "./ui/button";
 import { usePrivy } from "@privy-io/react-auth";
 
 const items = [
+  {
+    title: "AI Agent",
+    url: "/",
+    icon: Bot,
+  },
   {
     title: "Tokens",
     url: "tokens",
