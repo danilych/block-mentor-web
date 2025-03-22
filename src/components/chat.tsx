@@ -191,7 +191,7 @@ const Chat = ({ user }: { user: any }) => {
                       EChatMessageRole.USER
                     )
                   }
-                  className="absolute p-1 rounded-md bottom-1.5 md:bottom-2.5 bg-transparent disabled:bg-gray-500 right-1 md:right-2 disabled:opacity-40"
+                  className="absolute p-1 rounded-md bottom-0 md:bottom-2 bg-neutral-500 dark:bg-white disabled:bg-gray-500 right-1 md:right-2 disabled:opacity-40"
                 >
                   <p className="p-1">{'>'}</p>
                 </Button>
