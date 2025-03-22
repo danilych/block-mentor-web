@@ -4,7 +4,7 @@ export enum EChatMessageRole {
 }
 
 export type TChatMessage = {
-  prompt: string
+  content: string
   role: EChatMessageRole
   id: string
   createdAt?: number

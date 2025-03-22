@@ -5,12 +5,12 @@
 interface MessageProps {
   message: {
     role: 'USER' | 'AGENT';
-    prompt: string | null;
+    content: string | null;
   };
 }
 
 const Message = ({ message }: MessageProps) => {
-  const { role, prompt } = message;
+  const { role, content } = message;
   const isUser = role === "USER";
 
   return (
@@ -47,11 +47,11 @@ const Message = ({ message }: MessageProps) => {
             <div className="flex flex-grow flex-col gap-3">
               <div className="min-h-20 flex flex-col items-start gap-4 whitespace-pre-wrap break-words">
                 <div className="markdown prose w-full break-words dark:prose-invert dark">
-                  {!isUser && prompt === null ? (
+                  {!isUser && content === null ? (
                     // <TbCursorText className="h-6 w-6 animate-pulse" />
                     <p>Error</p>
                   ) : (
-                    <p>{prompt}</p>
+                    <p>{content}</p>
                   )}
                 </div>
               </div>

@@ -3,29 +3,44 @@ import Message from "@/components/message";
 import { Button } from "@/components/ui/button";
 import { EChatMessageRole, TChatMessage } from "@/types/aiChats";
 import { usePrivy } from "@privy-io/react-auth";
+import $client from "@/service/client";
 
 const Chat = () => {
   const [messages, setMessages] = useState<TChatMessage[]>([]);
   const bottomOfChatRef = useRef<HTMLDivElement>(null);
   const [isBotTyping, setIsBotTyping] = useState(false);  
   const { getAccessToken } = usePrivy();
-  const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const {ready, authenticated} = usePrivy();
 
   useEffect(() => {
     if (bottomOfChatRef.current) {
       bottomOfChatRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+  async function getOrCreateChat() {
+    try {
+     const res= await $client.get("/chats");
+      setMessages(res.data.messages)
+    } catch (error) {
+      console.error('Error getting or creating chat:', error);
+      return null;
+    }
+  }
 
+  useEffect(() => {
+if (!ready || !authenticated) return;
+getOrCreateChat()
+  }, [ready, authenticated])
+  
   async function sendMessage(prompt: string, role:string) {
-    console.log("Sending message...");
     const messageId = crypto.randomUUID();
     if (!prompt.length) return;
 
     const userMessage: TChatMessage = {
       role: EChatMessageRole.USER,
-      prompt: prompt,
+      content: prompt,
       id: messageId,
     };
 
@@ -59,7 +74,7 @@ const Chat = () => {
 
       const aiMessage: TChatMessage = {
         role: EChatMessageRole.AI,
-        prompt: "",
+        content: "",
         id: crypto.randomUUID(),
       };
 
@@ -105,9 +120,8 @@ const Chat = () => {
   }
 
   const handleKeypress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    console.log(e.target);
     if (e.key === 'Enter' && !e.shiftKey) {
-      formRef.current?.submit();
+      sendMessage(textareaRef.current?.value || "", EChatMessageRole.USER);
     }
   };
 
@@ -136,14 +150,7 @@ const Chat = () => {
           </div>
         </div>
         <div className="absolute bottom-0 left-0 w-full border-t md:border-t-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:bg-vert-light-gradient bg-white dark:bg-gray-800 md:!bg-transparent dark:md:bg-vert-dark-gradient pt-2">
-          <form
-          ref={formRef}
-            // onSubmit={(e) => {
-            //   e.preventDefault();
-            //   e.stopPropagation();
-            //   console.log(e.target.value)
-            //   // sendMessage(e.target.value, EChatMessageRole.USER);
-            // }}
+          <div
             className="stretch mx-2 flex flex-row gap-3 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl"
           >
             <div className="relative flex h-full flex-1 md:flex-col">
@@ -172,7 +179,7 @@ const Chat = () => {
                 </Button>
               </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
