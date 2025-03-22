@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "../../components/ui/input";
 import {useWallets} from '@privy-io/react-auth';
 import { formatEther } from "ethers";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface Token {
   name: string;
@@ -29,6 +30,7 @@ const TokensPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -95,52 +97,83 @@ const TokensPage = () => {
   }
 
   return (
-    <div className="w-full h-full p-6 space-y-6 opacity-85">
-      <div className="flex items-center">
-        <h1 className="text-2xl font-bold text-white">Tokens</h1>
-      </div>
-
-      <div className="w-full max-w-xs">
-        <Input
-          type="text"
-          placeholder="Search by name, symbol, or address..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full"
-        />
+    <div className="w-full h-full p-4 md:p-6 space-y-4 md:space-y-6 opacity-85">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-xl md:text-2xl font-bold text-white">Tokens</h1>
+        <div className="w-full sm:w-auto sm:min-w-[300px]">
+          <Input
+            type="text"
+            placeholder="Search by name, symbol, or address..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full"
+          />
+        </div>
       </div>
 
       <div className="relative overflow-x-auto rounded-lg border">
-        <table className="w-full text-sm text-left">
-          <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700">
-            <tr>
-              <th scope="col" className="px-6 py-3">Token</th>
-              <th scope="col" className="px-6 py-3">Created At</th>
-              <th scope="col" className="px-6 py-3">Initial Supply</th>
-              <th scope="col" className="px-6 py-3">Contract Address</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTokens.map((token, index) => (
-              <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                <td className="px-6 py-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                    <div>
-                      <div className="font-medium">{token.name}</div>
-                      <div className="text-gray-500">{token.symbol}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">{token.createdAt}</td>
-                <td className="px-6 py-4">{token.initialSupply}</td>
-                <td className="px-6 py-4">
-                  <span className="font-mono text-sm">{token.contractAddress}</span>
-                </td>
+        <div className="min-w-full overflow-x-auto">
+          <table className="w-full text-sm text-left table-fixed min-w-[350px]">
+            <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" className="px-4 md:px-6 py-3 w-[45%]">Token</th>
+                <th scope="col" className="px-4 md:px-6 py-3 w-[40%]">Contract Address</th>
+                <th scope="col" className="px-4 md:px-6 py-3 w-[15%] min-w-[60px]"></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredTokens.map((token) => (
+                <>
+                  <tr key={token.contractAddress} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <td className="px-4 md:px-6 py-4 min-w-0">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-200 rounded-full flex-shrink-0"></div>
+                        <div className="min-w-0">
+                          <div className="font-medium truncate">{token.name}</div>
+                          <div className="text-gray-500 truncate">{token.symbol}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 min-w-0">
+                      <span className="font-mono text-xs md:text-sm truncate block">
+                        {token.contractAddress}
+                      </span>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 text-right">
+                      <button
+                        onClick={() => setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress)}
+                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded inline-flex"
+                        aria-label={expandedRow === token.contractAddress ? "Collapse" : "Expand"}
+                      >
+                        {expandedRow === token.contractAddress ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </button>
+                    </td>
+                  </tr>
+                  {expandedRow === token.contractAddress && (
+                    <tr className="bg-gray-50 dark:bg-gray-900">
+                      <td colSpan={3} className="px-4 md:px-6 py-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <div className="text-sm font-medium text-gray-500">Created At</div>
+                            <div className="mt-1">{token.createdAt}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-500">Initial Supply</div>
+                            <div className="mt-1">{token.initialSupply}</div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
