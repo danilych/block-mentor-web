@@ -5,6 +5,7 @@ import { EChatMessageRole, TChatMessage } from '@/types/aiChats'
 import { usePrivy } from '@privy-io/react-auth'
 import $client from '@/service/client'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { API_BASE_URL } from '@/config'
 
 const Chat = ({ user }: { user: any }) => {
   const [messages, setMessages] = useState<TChatMessage[]>([])
@@ -55,7 +56,7 @@ const Chat = ({ user }: { user: any }) => {
     try {
       const token = await getAccessToken()
       const response = await fetch(
-        'https://api-production-a609.up.railway.app/api/messages',
+        `${API_BASE_URL}/messages`,
         {
           method: 'POST',
           headers: {
