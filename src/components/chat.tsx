@@ -24,15 +24,6 @@ const Chat = () => {
     }
   }, [messages, shouldAutoScroll]);
 
-  // Handle scroll events to determine if we should auto-scroll
-  const handleScroll = () => {
-    if (!chatContainerRef.current) return;
-    
-    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-    const isNearBottom = scrollHeight - (scrollTop + clientHeight) < 100;
-    setShouldAutoScroll(isNearBottom);
-  };
-
   useEffect(() => {
     if (!ready || !authenticated) return;
     getOrCreateChat()
@@ -144,8 +135,7 @@ const Chat = () => {
       <ScrollArea className="h-full">
       <div 
         ref={chatContainerRef}
-        onScroll={handleScroll}
-        className="flex-1  p-4"
+        className="flex-1 p-4"
       >
         {messages.map((message) => (
           <Message key={message.id} message={message} />
