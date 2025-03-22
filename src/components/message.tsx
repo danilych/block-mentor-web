@@ -2,21 +2,23 @@
 // import { HiUser } from "react-icons/hi";
 // import { TbCursorText } from "react-icons/tb";
 
+import { EChatMessageRole } from '@/types/aiChats'
+
 interface MessageProps {
   message: {
-    role: 'USER' | 'AGENT';
-    content: string | null;
-  };
+    role: EChatMessageRole
+    content: string | null
+  }
 }
 
 const Message = ({ message }: MessageProps) => {
-  const { role, content } = message;
-  const isUser = role === "USER";
+  const { role, content } = message
+  const isUser = role === EChatMessageRole.USER
 
   return (
     <div
       className={`group w-full max-w-3xl px-4 text-white dark:text-gray-100 border-b border-black/10 dark:border-gray-900/50 ${
-        isUser ? "bg-gray-800/70" : "bg-gray-700/70"
+        isUser ? 'bg-gray-800/70' : 'bg-gray-700/70'
       }`}
     >
       <div className="flex flex-col md:flex-row gap-3 py-3 md:py-6">
@@ -40,7 +42,7 @@ const Message = ({ message }: MessageProps) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Message;
+export default Message
