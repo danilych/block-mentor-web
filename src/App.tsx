@@ -1,29 +1,29 @@
-import { usePrivy } from "@privy-io/react-auth";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import ParticleEffect from "./components/Canvas";
-import Chat from "./components/chat";
-import Login from "./components/login";
-import TokensPage from "./pages/tokens";
-import VestingsPage from "./pages/vestings";
-import StakingsPage from "./pages/stakings";
-import { useEffect, useState } from "react";
-import $client from "./service/client";
-import { useHeadlessDelegatedActions } from "@privy-io/react-auth";
+import { usePrivy } from '@privy-io/react-auth'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import ParticleEffect from './components/Canvas'
+import Chat from './components/chat'
+import Login from './components/login'
+import TokensPage from './pages/tokens'
+import VestingsPage from './pages/vestings'
+import StakingsPage from './pages/stakings'
+import { useEffect, useState } from 'react'
+import $client from './service/client'
+import { useHeadlessDelegatedActions } from '@privy-io/react-auth'
 
 const App = () => {
-  const [user, setUser] = useState(null);
-  const { authenticated } = usePrivy();
-  const { delegateWallet } = useHeadlessDelegatedActions();
+  const [user, setUser] = useState(null)
+  const { authenticated } = usePrivy()
+  const { delegateWallet } = useHeadlessDelegatedActions()
 
   const handleGetOrCreateUser = async () => {
-    const {data} = await $client.post("/auth");
-      
+    const { data } = await $client.post('/auth')
+
     if (data) {
-      setUser(data);
+      setUser(data)
       delegateWallet({
-        address: data.address,
+        address: data.user.wallet,
         chainType: 'ethereum',
-      });
+      })
     }
   }
 
@@ -31,7 +31,7 @@ const App = () => {
     if (authenticated) {
       handleGetOrCreateUser()
     }
-  }, [authenticated]);
+  }, [authenticated])
 
   if (!authenticated) {
     return (
@@ -41,7 +41,7 @@ const App = () => {
         </div>
         <ParticleEffect />
       </div>
-    );
+    )
   }
 
   return (
@@ -57,7 +57,7 @@ const App = () => {
       </BrowserRouter>
       <ParticleEffect />
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
