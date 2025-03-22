@@ -14,7 +14,7 @@ import {
 import { Button } from "./ui/button";
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect } from "react";
-import { requestInstance } from "@/api/request";
+import $client from "@/service/client";
 
 const items = [
   //TODO: top up your wallet
@@ -47,7 +47,7 @@ export function AppSidebar() {
   const { logout, authenticated } = usePrivy();
   useEffect(() => {
     if (authenticated) {
-      requestInstance.post("/auth");
+      $client.post("/auth");
     }
   }, [authenticated]);
   if (!authenticated) return <></>;

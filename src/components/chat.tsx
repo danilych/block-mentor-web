@@ -33,7 +33,8 @@ const Chat = () => {
     setMessages(prev => [...prev, userMessage]);
 
     setIsBotTyping(true);
-
+// TODO: autoRise VLAD 
+// TODO: get chat with messages
     try {
       const token = await getAccessToken();
       const response = await fetch("https://api-production-a609.up.railway.app/api/messages", {
