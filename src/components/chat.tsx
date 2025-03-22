@@ -4,13 +4,11 @@ import { Button } from "@/components/ui/button";
 import { EChatMessageRole, TChatMessage } from "@/types/aiChats";
 import { usePrivy } from "@privy-io/react-auth";
 import $client from "@/service/client";
-import { API_BASE_URL } from "@/config";
 
 const Chat = () => {
   const [messages, setMessages] = useState<TChatMessage[]>([]);
   const bottomOfChatRef = useRef<HTMLDivElement>(null);
   const [isBotTyping, setIsBotTyping] = useState(false);  
-  const { getAccessToken } = usePrivy();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const {ready, authenticated} = usePrivy();
@@ -52,24 +50,18 @@ const Chat = () => {
 // TODO: autoRise VLAD 
 // TODO: get chat with messages
     try {
-      const token = await getAccessToken();
-      const response = await fetch(`${API_BASE_URL}/messages`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ 
-          content:prompt,
-          role: role,
-        })
+      const response = await $client.post('/messages', {
+        content: prompt,
+        role: role,
+      }, {
+        responseType: 'stream'
       });
     
-      if (!response.ok || !response.body) {
+      if (!response.data) {
         throw new Error('Failed to send message');
       }
 
-      const reader = response.body.getReader();
+      const reader = response.data.getReader();
       const decoder = new TextDecoder();
       let resultString = "";
 
