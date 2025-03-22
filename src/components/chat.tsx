@@ -30,10 +30,10 @@ const Chat = () => {
   }
 
   useEffect(() => {
-if (!ready || !authenticated) return;
-getOrCreateChat()
+    if (!ready || !authenticated) return;
+    getOrCreateChat()
   }, [ready, authenticated])
-  
+
   async function sendMessage(prompt: string, role:string) {
     const messageId = crypto.randomUUID();
     if (!prompt.length) return;
@@ -59,7 +59,7 @@ getOrCreateChat()
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ 
-          prompt:prompt,
+          content:prompt,
           role: role,
         })
       });
@@ -100,7 +100,7 @@ getOrCreateChat()
   setMessages((prevMessages: TChatMessage[]) =>
     prevMessages.map((msg) =>
       msg.id === aiMessage.id
-        ? { ...msg, prompt: resultString, chunks: [...(msg.chunks || []), ...cleanedMessages] }
+        ? { ...msg, content: resultString, chunks: [...(msg.chunks || []), ...cleanedMessages] }
         : msg
     )
   );
