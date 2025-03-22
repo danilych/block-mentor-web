@@ -8,15 +8,23 @@ import VestingsPage from "./pages/vestings";
 import StakingsPage from "./pages/stakings";
 import { useEffect, useState } from "react";
 import $client from "./service/client";
+import { useHeadlessDelegatedActions } from "@privy-io/react-auth";
 
 const App = () => {
   const [user, setUser] = useState(null);
   const { authenticated } = usePrivy();
+  const { delegateWallet } = useHeadlessDelegatedActions();
 
   const handleGetOrCreateUser = async () => {
     const {data} = await $client.post("/auth");
       
-    setUser(data)
+    if (data) {
+      setUser(data);
+      delegateWallet({
+        address: data.address,
+        chainType: 'ethereum',
+      });
+    }
   }
 
   useEffect(() => {
