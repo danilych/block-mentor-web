@@ -124,7 +124,11 @@ const TokensPage = () => {
             <tbody>
               {filteredTokens.map((token) => (
                 <>
-                  <tr key={token.contractAddress} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <tr 
+                    key={token.contractAddress} 
+                    onClick={() => setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress)}
+                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
+                  >
                     <td className="px-4 md:px-6 py-4 min-w-0">
                       <div className="flex items-center space-x-2">
                         <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-200 rounded-full flex-shrink-0"></div>
@@ -141,7 +145,10 @@ const TokensPage = () => {
                     </td>
                     <td className="px-4 md:px-6 py-4 text-right">
                       <button
-                        onClick={() => setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress);
+                        }}
                         className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded inline-flex"
                         aria-label={expandedRow === token.contractAddress ? "Collapse" : "Expand"}
                       >
