@@ -13,8 +13,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
 import { usePrivy } from "@privy-io/react-auth";
+import { useEffect } from "react";
+import { requestInstance } from "@/api/request";
 
 const items = [
+  //TODO: top up your wallet
   {
     title: "AI Agent",
     url: "/",
@@ -42,6 +45,11 @@ export function AppSidebar() {
     logout();
   };
   const { logout, authenticated } = usePrivy();
+  useEffect(() => {
+    if (authenticated) {
+      requestInstance.post("/auth");
+    }
+  }, [authenticated]);
   if (!authenticated) return <></>;
   return (
     <Sidebar>

@@ -2,8 +2,8 @@ import { usePrivy } from "@privy-io/react-auth";
 import { Button } from "@/components/ui/button";
 
 function Login() {
-  const handleClick = () => {
-    login();
+  const handleClick = async () => {
+    await login();
   };
   const { ready, login } = usePrivy();
   if (!ready) {
