@@ -24,7 +24,6 @@ createRoot(document.getElementById('root')!).render(
           requireUserPasswordOnCreate: false,
         },
       }}
-      enableDelegateActions={true}
     >
       <SidebarProvider>
         <AppSidebar />
