@@ -6,9 +6,24 @@ import Login from "./components/login";
 import TokensPage from "./pages/tokens";
 import VestingsPage from "./pages/vestings";
 import StakingsPage from "./pages/stakings";
+import { useEffect, useState } from "react";
+import $client from "./service/client";
 
 const App = () => {
+  const [user, setUser] = useState(null);
   const { authenticated } = usePrivy();
+
+  const handleGetOrCreateUser = async () => {
+    const {data} = await $client.post("/auth");
+      
+    setUser(data)
+  }
+
+  useEffect(() => {
+    if (authenticated) {
+      handleGetOrCreateUser()
+    }
+  }, [authenticated]);
 
   if (!authenticated) {
     return (
@@ -25,7 +40,7 @@ const App = () => {
     <div className="overflow-hidden w-full h-screen relative flex">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Chat />} />
+          <Route path="/" element={<Chat user={user} />} />
           <Route path="/tokens" element={<TokensPage />} />
           <Route path="/vestings" element={<VestingsPage />} />
           <Route path="/stakings" element={<StakingsPage />} />

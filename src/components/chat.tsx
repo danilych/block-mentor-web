@@ -5,14 +5,14 @@ import { EChatMessageRole, TChatMessage } from "@/types/aiChats";
 import { usePrivy } from "@privy-io/react-auth";
 import $client from "@/service/client";
 
-const Chat = () => {
+const Chat = ({user}: {user: any}) => {
   const [messages, setMessages] = useState<TChatMessage[]>([]);
   const bottomOfChatRef = useRef<HTMLDivElement>(null);
   const [isBotTyping, setIsBotTyping] = useState(false);  
   const { getAccessToken } = usePrivy();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const {ready, authenticated} = usePrivy();
+  const {authenticated} = usePrivy();
 
   useEffect(() => {
     if (bottomOfChatRef.current) {
@@ -30,9 +30,11 @@ const Chat = () => {
   }
 
   useEffect(() => {
-    if (!ready || !authenticated) return;
-    getOrCreateChat()
-  }, [ready, authenticated])
+    if (authenticated && user) {
+      getOrCreateChat()
+    };
+    
+  }, [authenticated, user])
 
   async function sendMessage(prompt: string, role:string) {
     const messageId = crypto.randomUUID();
