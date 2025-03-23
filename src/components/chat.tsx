@@ -54,20 +54,17 @@ const Chat = ({ user }: { user: any }) => {
     setIsBotTyping(true)
     try {
       const token = await getAccessToken()
-      const response = await fetch(
-        `${API_BASE_URL}/messages`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            content: prompt,
-            role: role,
-          }),
-        }
-      )
+      const response = await fetch(`${API_BASE_URL}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          content: prompt,
+          role: role,
+        }),
+      })
 
       if (!response.ok || !response.body) {
         throw new Error('Failed to send message')
@@ -92,19 +89,19 @@ const Chat = ({ user }: { user: any }) => {
         const { done, value } = await reader.read()
         if (done) break
         const messageChunk = decoder.decode(value, { stream: true })
-        const cleanedMessages = messageChunk
-          .split('\n')
-          .filter(line => line.startsWith('data: '))
-          .map(line => line.replace('data: ', ''))
+        const cleanedMessages = messageChunk.split('')
 
         cleanedMessages.forEach(chunk => {
-          if (previousChunk && (previousChunk.match(/[a-zA-Z0-9]$/) || chunk.match(/^[a-zA-Z0-9]/))) {
-            resultString += ' ' + chunk;
+          if (
+            previousChunk &&
+            (previousChunk.match(/[a-zA-Z0-9]$/) || chunk.match(/^[a-zA-Z0-9]/))
+          ) {
+            resultString += '' + chunk
           } else {
-            resultString += chunk;
-            }
-            previousChunk = chunk;
-          });
+            resultString += chunk
+          }
+          previousChunk = chunk
+        })
 
         // Update AI message content **incrementally**
         setMessages((prevMessages: TChatMessage[]) =>
