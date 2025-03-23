@@ -6,7 +6,6 @@ import Login from './components/login'
 import TokensPage from './pages/tokens'
 import VestingsPage from './pages/vestings'
 import StakingsPage from './pages/stakings'
-import Bridge from './pages/bridge'
 import { useEffect, useState } from 'react'
 import $client from './service/client'
 import { useHeadlessDelegatedActions } from '@privy-io/react-auth'
@@ -54,7 +53,6 @@ const App = () => {
           <Route path="/tokens" element={<TokensPage />} />
           <Route path="/vestings" element={<VestingsPage />} />
           <Route path="/stakings" element={<StakingsPage />} />
-          <Route path="/bridge" element={<Bridge />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
