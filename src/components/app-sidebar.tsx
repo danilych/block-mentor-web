@@ -1,4 +1,4 @@
-import { CircleDollarSign, Layers, Coins, Bot } from "lucide-react";
+import { CircleDollarSign, Layers, Coins, Bot, ArrowLeftRight } from "lucide-react";
 
 import {
   Sidebar,
@@ -25,6 +25,11 @@ const items = [
     title: "Tokens",
     url: "tokens",
     icon: Coins,
+  },
+  {
+    title: "Bridge",
+    url: "bridge",
+    icon: ArrowLeftRight,
   },
   {
     title: "Vestings",
