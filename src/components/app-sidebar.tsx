@@ -28,7 +28,7 @@ const items = [
   },
   {
     title: "Vestings",
-    url: "#",
+    url: "vestings",
     icon: CircleDollarSign,
   },
   {
