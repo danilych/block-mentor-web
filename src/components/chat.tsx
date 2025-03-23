@@ -139,6 +139,12 @@ const Chat = ({ user }: { user: any }) => {
     }
   }
 
+  const handleTextareaInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const textarea = e.target;
+    textarea.style.height = '24px';
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  };
+
   return (
     <div className="flex max-w-full flex-1 flex-col">
       <div className="relative h-full w-full transition-width flex flex-col overflow-hidden items-stretch flex-1">
@@ -174,13 +180,14 @@ const Chat = ({ user }: { user: any }) => {
                   tabIndex={0}
                   rows={1}
                   placeholder="Send a message..."
-                  className="m-0 w-full outline-none resize-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent pl-2 md:pl-0"
+                  className="m-0 w-full outline-none resize-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent pl-2 md:pl-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600"
                   style={{
                     maxHeight: '200px',
-                    height: '24px',
-                    overflowY: 'hidden',
+                    minHeight: '24px',
+                    overflowY: 'auto',
                   }}
                   onKeyDown={handleKeypress}
+                  onInput={handleTextareaInput}
                 />
                 <Button
                   disabled={isBotTyping}
