@@ -155,20 +155,19 @@ const Chat = ({ user }: { user: any }) => {
                     <div ref={bottomOfChatRef}></div>
                   </div>
                 ) : null}
-
-                {isBotTyping && (
-                  <div className="text-sm text-gray-500 italic p-4">
-                    Assistant is typing...
-                  </div>
-                )}
               </div>
             </div>
           </ScrollArea>
         </div>
         <div className="absolute bottom-0 left-0 w-full border-t md:border-t-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:bg-vert-light-gradient bg-white dark:bg-gray-800 md:!bg-transparent dark:md:bg-vert-dark-gradient pt-2">
           <div className="stretch mx-2 flex flex-row gap-3 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
-            <div className="relative flex h-full flex-1 md:flex-col">
+            <div className="relative flex h-full flex-1 flex-col">
               <div className="flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]">
+                {!isBotTyping && (
+                  <div className="animate-pulse text-sm text-gray-200 italic px-4 py-2 absolute -top-10 left-0 right-0 bg-transparent">
+                    Assistant is typing...
+                  </div>
+                )}
                 <textarea
                   disabled={isBotTyping}
                   ref={textareaRef}
