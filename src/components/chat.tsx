@@ -39,6 +39,7 @@ const Chat = ({ user }: { user: any }) => {
 
   async function sendMessage(prompt: string, role: string) {
     const messageId = crypto.randomUUID()
+    if(textareaRef.current) textareaRef.current.value = ''
     if (!prompt.length) return
 
     const userMessage: TChatMessage = {
@@ -51,8 +52,6 @@ const Chat = ({ user }: { user: any }) => {
     setMessages(prev => [...prev, userMessage])
 
     setIsBotTyping(true)
-    // TODO: autoRise VLAD
-    // TODO: get chat with messages
     try {
       const token = await getAccessToken()
       const response = await fetch(
