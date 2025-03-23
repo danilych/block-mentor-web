@@ -3,6 +3,7 @@ import { Input } from "../../components/ui/input";
 import { useWallets } from '@privy-io/react-auth';
 import { ChevronDown, ChevronUp, CircleX, ExternalLink } from "lucide-react";
 import { API_BASE_URL } from "@/config";
+import { getBridgeUrl } from "@/config/constants";
 
 interface Vesting {
   id: string;
@@ -71,7 +72,7 @@ const VestingsPage = () => {
           createdAt: new Date(parseInt(vesting.blockTimestamp) * 1000).toLocaleDateString(),
           tokenAddress: vesting.token_address,
           owner: vesting.owner,
-          webpage: `https://sepolia.etherscan.io/token/${vesting.token_address}`
+          webpage: getBridgeUrl(vesting.token_address)
         }));
         setVestings(formattedVestings);
       } catch (error) {
