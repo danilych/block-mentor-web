@@ -5,22 +5,31 @@ import { ChevronDown, ChevronUp, CircleX, ExternalLink } from "lucide-react";
 import { API_BASE_URL } from "@/config";
 
 interface Vesting {
+  id: string;
   tokenName: string;
   tokenSymbol: string;
+  amount: string;
+  totalPeriods: string;
+  periodDuration: string;
+  startTimestamp: string;
   createdAt: string;
   tokenAddress: string;
-  vestingAddress: string;
-  webpage: string;
+  owner: string;
+  webpage?: string;
 }
 
 interface ApiVesting {
   id: string;
   blockTimestamp: string;
   token_name: string;
-  token_symbol: string;
+  token_ticker: string;
+  amount: string;
+  total_periods: string;
+  period_duration: string;
+  start_timestamp: string;
   token_address: string;
-  vesting_address: string;
-  webpage: string;
+  owner: string;
+  webpage?: string;
 }
 
 const VestingsPage = () => {
@@ -50,14 +59,19 @@ const VestingsPage = () => {
         if (!response.ok) {
           throw new Error('Failed to fetch vestings');
         }
-        const apiData: ApiVesting[] = await response.json();
-        const formattedVestings: Vesting[] = apiData.map(vesting => ({
+        const data: ApiVesting[] = await response.json();
+        const formattedVestings = data.map((vesting: ApiVesting) => ({
+          id: vesting.id,
           tokenName: vesting.token_name,
-          tokenSymbol: vesting.token_symbol,
+          tokenSymbol: vesting.token_ticker,
+          amount: vesting.amount,
+          totalPeriods: vesting.total_periods,
+          periodDuration: vesting.period_duration,
+          startTimestamp: new Date(parseInt(vesting.start_timestamp) * 1000).toLocaleDateString(),
           createdAt: new Date(parseInt(vesting.blockTimestamp) * 1000).toLocaleDateString(),
           tokenAddress: vesting.token_address,
-          vestingAddress: vesting.vesting_address,
-          webpage: vesting.webpage
+          owner: vesting.owner,
+          webpage: `https://sepolia.etherscan.io/token/${vesting.token_address}`
         }));
         setVestings(formattedVestings);
       } catch (error) {
@@ -75,7 +89,7 @@ const VestingsPage = () => {
     vesting.tokenName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vesting.tokenSymbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vesting.tokenAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vesting.vestingAddress.toLowerCase().includes(searchTerm.toLowerCase())
+    vesting.owner.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (isLoading) {
@@ -133,7 +147,7 @@ const VestingsPage = () => {
                 <th scope="col" className="px-4 md:px-6 py-3">Token</th>
                 <th scope="col" className="px-4 md:px-6 py-3">Created At</th>
                 <th scope="col" className="px-4 md:px-6 py-3">Token Address</th>
-                <th scope="col" className="px-4 md:px-6 py-3">Vesting Address</th>
+                <th scope="col" className="px-4 md:px-6 py-3">Owner</th>
                 <th scope="col" className="px-4 md:px-6 py-3">Webpage</th>
                 <th scope="col" className="px-4 md:px-6 py-3 w-10"></th>
               </tr>
@@ -143,8 +157,8 @@ const VestingsPage = () => {
                 filteredVestings.map((vesting) => (
                   <>
                     <tr 
-                      key={vesting.vestingAddress} 
-                      onClick={() => setExpandedRow(expandedRow === vesting.vestingAddress ? null : vesting.vestingAddress)}
+                      key={vesting.id} 
+                      onClick={() => setExpandedRow(expandedRow === vesting.id ? null : vesting.id)}
                       className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
                     >
                       <td className="px-4 md:px-6 py-4">
@@ -162,11 +176,7 @@ const VestingsPage = () => {
                           {vesting.tokenAddress}
                         </span>
                       </td>
-                      <td className="px-4 md:px-6 py-4">
-                        <span className="font-mono text-xs truncate block max-w-[150px]" title={vesting.vestingAddress}>
-                          {vesting.vestingAddress}
-                        </span>
-                      </td>
+                      <td className="px-4 md:px-6 py-4">{vesting.owner}</td>
                       <td className="px-4 md:px-6 py-4">
                         {vesting.webpage && (
                           <a
@@ -184,12 +194,12 @@ const VestingsPage = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setExpandedRow(expandedRow === vesting.vestingAddress ? null : vesting.vestingAddress);
+                            setExpandedRow(expandedRow === vesting.id ? null : vesting.id);
                           }}
                           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded inline-flex"
-                          aria-label={expandedRow === vesting.vestingAddress ? "Collapse" : "Expand"}
+                          aria-label={expandedRow === vesting.id ? "Collapse" : "Expand"}
                         >
-                          {expandedRow === vesting.vestingAddress ? (
+                          {expandedRow === vesting.id ? (
                             <ChevronUp className="w-4 h-4" />
                           ) : (
                             <ChevronDown className="w-4 h-4" />
@@ -197,7 +207,7 @@ const VestingsPage = () => {
                         </button>
                       </td>
                     </tr>
-                    {expandedRow === vesting.vestingAddress && (
+                    {expandedRow === vesting.id && (
                       <tr className="bg-gray-50 dark:bg-gray-900">
                         <td colSpan={6} className="px-4 md:px-6 py-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -206,9 +216,24 @@ const VestingsPage = () => {
                               <div className="mt-1 font-mono break-all">{vesting.tokenAddress}</div>
                             </div>
                             <div>
-                              <div className="text-sm font-medium text-gray-500">Vesting Address</div>
-                              <div className="mt-1 font-mono break-all">{vesting.vestingAddress}</div>
+                              <div className="text-sm font-medium text-gray-500">Owner</div>
+                              <div className="mt-1">{vesting.owner}</div>
                             </div>
+                            {vesting.webpage && (
+                              <div>
+                                <div className="text-sm font-medium text-gray-500">Webpage</div>
+                                <div className="mt-1">
+                                  <a
+                                    href={vesting.webpage}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:text-blue-600 inline-flex items-center gap-1"
+                                  >
+                                    {vesting.webpage} <ExternalLink className="w-4 h-4" />
+                                  </a>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </td>
                       </tr>
