@@ -16,28 +16,28 @@ const Message = ({ message }: MessageProps) => {
   const isUser = role === EChatMessageRole.USER
 
   return (
-    <div
-      className={`group w-full max-w-3xl px-4 text-white dark:text-gray-100 border-b border-black/10 dark:border-gray-900/50 ${
-        isUser ? 'bg-gray-800/70' : 'bg-gray-700/70'
-      }`}
-    >
-      <div className="flex flex-col md:flex-row gap-3 py-3 md:py-6">
-        <div className="flex-shrink-0">
-          <div className="relative h-8 w-8 rounded-sm text-white flex items-center justify-center bg-black/75">
-            {isUser ? (
-              <p className="text-sm">user</p>
-            ) : (
-              <p className="text-sm">AI</p>
-            )}
+    <div className={`w-full max-w-3xl px-4 mb-4 flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+      <div
+        className={`relative max-w-[90%] rounded-2xl shadow-sm 
+          ${isUser 
+            ? 'bg-gray-500/70 rounded-tr-sm' 
+            : 'bg-gray-700/70 rounded-tl-sm'
+          }`}
+      >
+        <div className="flex flex-col gap-2 p-4">
+          <div className={`absolute ${isUser ? '-top-3 right-0' : '-top-3 left-0'}`}>
+            <div className="h-6 w-6 rounded-full text-white flex items-center justify-center bg-black/75 text-xs">
+              {isUser ? 'U' : 'AI'}
+            </div>
           </div>
-        </div>
-        <div className="flex-1 overflow-hidden">
-          <div className="prose prose-sm md:prose-base w-full break-words dark:prose-invert dark">
-            {!isUser && content === null ? (
-              <p className="text-gray-400">Error</p>
-            ) : (
-              <div className="whitespace-pre-wrap">{content}</div>
-            )}
+          <div className="flex-1 overflow-hidden mt-2">
+            <div className={`prose prose-sm md:prose-base w-full break-words dark:prose-invert dark ${isUser ? 'pr-2' : 'pl-2'}`}>
+              {!isUser && content === null ? (
+                <p className="text-gray-400">Error</p>
+              ) : (
+                <div className="whitespace-pre-wrap text-white">{content}</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
