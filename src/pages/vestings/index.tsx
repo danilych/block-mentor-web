@@ -1,66 +1,68 @@
-import { useState, useEffect } from "react";
-import { Input } from "../../components/ui/input";
-import { useWallets } from '@privy-io/react-auth';
-import { ChevronDown, ChevronUp, CircleX, ExternalLink } from "lucide-react";
-import { API_BASE_URL } from "@/config";
-import { getBridgeUrl } from "@/config/constants";
+import { useState, useEffect } from 'react'
+import { Input } from '../../components/ui/input'
+import { useWallets } from '@privy-io/react-auth'
+import { ChevronDown, ChevronUp, CircleX, ExternalLink } from 'lucide-react'
+import { API_BASE_URL } from '@/config'
+import { getVestingeUrl } from '@/config/constants'
 
 interface Vesting {
-  id: string;
-  tokenName: string;
-  tokenSymbol: string;
-  amount: string;
-  totalPeriods: string;
-  periodDuration: string;
-  startTimestamp: string;
-  createdAt: string;
-  tokenAddress: string;
-  owner: string;
-  webpage?: string;
+  id: string
+  tokenName: string
+  tokenSymbol: string
+  amount: string
+  totalPeriods: string
+  periodDuration: string
+  startTimestamp: string
+  createdAt: string
+  tokenAddress: string
+  owner: string
+  webpage?: string
 }
 
 interface ApiVesting {
-  id: string;
-  blockTimestamp: string;
-  token_name: string;
-  token_ticker: string;
-  amount: string;
-  total_periods: string;
-  period_duration: string;
-  start_timestamp: string;
-  token_address: string;
-  owner: string;
-  webpage?: string;
+  id: string
+  blockTimestamp: string
+  token_name: string
+  token_ticker: string
+  amount: string
+  total_periods: string
+  period_duration: string
+  start_timestamp: string
+  token_address: string
+  owner: string
+  webpage?: string
 }
 
 const VestingsPage = () => {
-  const { wallets } = useWallets();
-  const embeddedWallet = wallets?.[0];
-  const [vestings, setVestings] = useState<Vesting[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const { wallets } = useWallets()
+  const embeddedWallet = wallets?.[0]
+  const [vestings, setVestings] = useState<Vesting[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [expandedRow, setExpandedRow] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchVestings = async () => {
       if (!embeddedWallet?.address) {
-        setError("Please connect your wallet first");
-        return;
+        setError('Please connect your wallet first')
+        return
       }
-      
-      setIsLoading(true);
-      setError(null);
+
+      setIsLoading(true)
+      setError(null)
       try {
-        const response = await fetch(`${API_BASE_URL}/user/vestings/${embeddedWallet.address}`);
-        if(response.status === 404) {
-          setVestings([]);
-          return;
+        const response = await fetch(
+          `${API_BASE_URL}/user/vestings/${embeddedWallet.address}`
+        )
+        if (response.status === 404) {
+          setVestings([])
+          return
         }
         if (!response.ok) {
-          throw new Error('Failed to fetch vestings');
+          throw new Error('Failed to fetch vestings')
         }
-        const data: ApiVesting[] = await response.json();
+        const data: ApiVesting[] = await response.json()
         const formattedVestings = data.map((vesting: ApiVesting) => ({
           id: vesting.id,
           tokenName: vesting.token_name,
@@ -68,37 +70,42 @@ const VestingsPage = () => {
           amount: vesting.amount,
           totalPeriods: vesting.total_periods,
           periodDuration: vesting.period_duration,
-          startTimestamp: new Date(parseInt(vesting.start_timestamp) * 1000).toLocaleDateString(),
-          createdAt: new Date(parseInt(vesting.blockTimestamp) * 1000).toLocaleDateString(),
+          startTimestamp: new Date(
+            parseInt(vesting.start_timestamp) * 1000
+          ).toLocaleDateString(),
+          createdAt: new Date(
+            parseInt(vesting.blockTimestamp) * 1000
+          ).toLocaleDateString(),
           tokenAddress: vesting.token_address,
           owner: vesting.owner,
-          webpage: getBridgeUrl(vesting.token_address)
-        }));
-        setVestings(formattedVestings);
+          webpage: getVestingeUrl(vesting.token_address),
+        }))
+        setVestings(formattedVestings)
       } catch (error) {
-        console.error('Error fetching vestings:', error);
-        setError("Failed to fetch vestings. Please try again later.");
+        console.error('Error fetching vestings:', error)
+        setError('Failed to fetch vestings. Please try again later.')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchVestings();
-  }, [embeddedWallet?.address]);
+    fetchVestings()
+  }, [embeddedWallet?.address])
 
-  const filteredVestings = vestings.filter(vesting => 
-    vesting.tokenName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vesting.tokenSymbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vesting.tokenAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vesting.owner.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredVestings = vestings.filter(
+    vesting =>
+      vesting.tokenName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vesting.tokenSymbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vesting.tokenAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vesting.owner.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   if (isLoading) {
     return (
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-lg">Loading vestings...</div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -106,7 +113,7 @@ const VestingsPage = () => {
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-lg text-red-500">{error}</div>
       </div>
-    );
+    )
   }
 
   if (vestings.length === 0 && !error) {
@@ -119,10 +126,12 @@ const VestingsPage = () => {
           <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
             <CircleX className="w-8 h-8 text-gray-400" />
           </div>
-          <div className="text-xl font-semibold text-center">No vestings found</div>
+          <div className="text-xl font-semibold text-center">
+            No vestings found
+          </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -134,7 +143,7 @@ const VestingsPage = () => {
             type="text"
             placeholder="Search by token name, symbol, or addresses..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="w-full"
           />
         </div>
@@ -145,35 +154,56 @@ const VestingsPage = () => {
           <table className="w-full text-sm text-left min-w-[800px]">
             <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th scope="col" className="px-4 md:px-6 py-3">Token</th>
-                <th scope="col" className="px-4 md:px-6 py-3">Created At</th>
-                <th scope="col" className="px-4 md:px-6 py-3">Token Address</th>
-                <th scope="col" className="px-4 md:px-6 py-3">Owner</th>
-                <th scope="col" className="px-4 md:px-6 py-3">Webpage</th>
+                <th scope="col" className="px-4 md:px-6 py-3">
+                  Token
+                </th>
+                <th scope="col" className="px-4 md:px-6 py-3">
+                  Created At
+                </th>
+                <th scope="col" className="px-4 md:px-6 py-3">
+                  Token Address
+                </th>
+                <th scope="col" className="px-4 md:px-6 py-3">
+                  Owner
+                </th>
+                <th scope="col" className="px-4 md:px-6 py-3">
+                  Webpage
+                </th>
                 <th scope="col" className="px-4 md:px-6 py-3 w-10"></th>
               </tr>
             </thead>
             <tbody>
               {filteredVestings.length > 0 ? (
-                filteredVestings.map((vesting) => (
+                filteredVestings.map(vesting => (
                   <>
-                    <tr 
-                      key={vesting.id} 
-                      onClick={() => setExpandedRow(expandedRow === vesting.id ? null : vesting.id)}
+                    <tr
+                      key={vesting.id}
+                      onClick={() =>
+                        setExpandedRow(
+                          expandedRow === vesting.id ? null : vesting.id
+                        )
+                      }
                       className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
                     >
                       <td className="px-4 md:px-6 py-4">
                         <div className="flex items-center space-x-2">
                           <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex-shrink-0"></div>
                           <div>
-                            <div className="font-medium">{vesting.tokenName}</div>
-                            <div className="text-gray-500">{vesting.tokenSymbol}</div>
+                            <div className="font-medium">
+                              {vesting.tokenName}
+                            </div>
+                            <div className="text-gray-500">
+                              {vesting.tokenSymbol}
+                            </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 md:px-6 py-4">{vesting.createdAt}</td>
                       <td className="px-4 md:px-6 py-4">
-                        <span className="font-mono text-xs truncate block max-w-[150px]" title={vesting.tokenAddress}>
+                        <span
+                          className="font-mono text-xs truncate block max-w-[150px]"
+                          title={vesting.tokenAddress}
+                        >
                           {vesting.tokenAddress}
                         </span>
                       </td>
@@ -184,7 +214,7 @@ const VestingsPage = () => {
                             href={vesting.webpage}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={e => e.stopPropagation()}
                             className="text-blue-500 hover:text-blue-600 inline-flex items-center gap-1"
                           >
                             View <ExternalLink className="w-4 h-4" />
@@ -193,12 +223,16 @@ const VestingsPage = () => {
                       </td>
                       <td className="px-4 md:px-6 py-4 text-right">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedRow(expandedRow === vesting.id ? null : vesting.id);
+                          onClick={e => {
+                            e.stopPropagation()
+                            setExpandedRow(
+                              expandedRow === vesting.id ? null : vesting.id
+                            )
                           }}
                           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded inline-flex"
-                          aria-label={expandedRow === vesting.id ? "Collapse" : "Expand"}
+                          aria-label={
+                            expandedRow === vesting.id ? 'Collapse' : 'Expand'
+                          }
                         >
                           {expandedRow === vesting.id ? (
                             <ChevronUp className="w-4 h-4" />
@@ -213,16 +247,24 @@ const VestingsPage = () => {
                         <td colSpan={6} className="px-4 md:px-6 py-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <div className="text-sm font-medium text-gray-500">Token Address</div>
-                              <div className="mt-1 font-mono break-all">{vesting.tokenAddress}</div>
+                              <div className="text-sm font-medium text-gray-500">
+                                Token Address
+                              </div>
+                              <div className="mt-1 font-mono break-all">
+                                {vesting.tokenAddress}
+                              </div>
                             </div>
                             <div>
-                              <div className="text-sm font-medium text-gray-500">Owner</div>
+                              <div className="text-sm font-medium text-gray-500">
+                                Owner
+                              </div>
                               <div className="mt-1">{vesting.owner}</div>
                             </div>
                             {vesting.webpage && (
                               <div>
-                                <div className="text-sm font-medium text-gray-500">Webpage</div>
+                                <div className="text-sm font-medium text-gray-500">
+                                  Webpage
+                                </div>
                                 <div className="mt-1">
                                   <a
                                     href={vesting.webpage}
@@ -230,7 +272,8 @@ const VestingsPage = () => {
                                     rel="noopener noreferrer"
                                     className="text-blue-500 hover:text-blue-600 inline-flex items-center gap-1"
                                   >
-                                    {vesting.webpage} <ExternalLink className="w-4 h-4" />
+                                    {vesting.webpage}
+                                    <ExternalLink className="w-4 h-4" />
                                   </a>
                                 </div>
                               </div>
@@ -253,7 +296,7 @@ const VestingsPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default VestingsPage;
+export default VestingsPage
