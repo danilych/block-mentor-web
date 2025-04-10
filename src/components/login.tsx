@@ -1,13 +1,23 @@
-import { usePrivy } from "@privy-io/react-auth";
-import { Button } from "@/components/ui/button";
+import { usePrivy, useLogin } from '@privy-io/react-auth'
+import { Button } from '@/components/ui/button'
+import $client from '@/service/client'
 
 function Login() {
+  const register = async () => {
+    await $client.post('/auth')
+  }
+
+  const { ready } = usePrivy()
+  const { login } = useLogin({
+    onComplete: register,
+  })
+
   const handleClick = async () => {
-    await login();
-  };
-  const { ready, login } = usePrivy();
+    await login()
+  }
+
   if (!ready) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
   return (
     <div className="flex flex-col items-center justify-center">
@@ -16,7 +26,7 @@ function Login() {
       </h2>
       <Button onClick={handleClick}>Login</Button>
     </div>
-  );
+  )
 }
 
-export default Login;
+export default Login

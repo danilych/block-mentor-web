@@ -12,7 +12,7 @@ import { useHeadlessDelegatedActions } from '@privy-io/react-auth'
 
 const App = () => {
   const [user, setUser] = useState(null)
-  const { authenticated } = usePrivy()
+  const { authenticated, ready, user: privyUser } = usePrivy()
   const { delegateWallet } = useHeadlessDelegatedActions()
 
   const handleGetOrCreateUser = async () => {
@@ -29,10 +29,13 @@ const App = () => {
   }
 
   useEffect(() => {
-    if (authenticated) {
+    if (
+      authenticated &&
+      privyUser?.linkedAccounts.some(lAcc => lAcc?.type === 'wallet')
+    ) {
       handleGetOrCreateUser()
     }
-  }, [authenticated])
+  }, [authenticated, privyUser])
 
   if (!authenticated) {
     return (
