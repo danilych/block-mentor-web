@@ -8,26 +8,45 @@ interface MessageProps {
 
 const Message: React.FC<MessageProps> = ({ message }) => {
   const isUser = message.role === ChatMessageRole.USER
-  
+
   return (
-    <div className={cn(
-      "relative m-auto flex gap-4 p-6 text-base md:max-w-2xl lg:max-w-[38rem] xl:max-w-3xl w-full flex-1",
-      isUser ? "bg-gray-200 dark:bg-[#242424]" : "bg-gray-100 dark:bg-[#1c1c1c]"
-    )}>
+    <div
+      className={cn(
+        'w-full max-w-3xl px-4 mb-4 flex',
+        isUser ? 'justify-end' : 'justify-start'
+      )}
+    >
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-md border shadow",
+          'relative max-w-[90%] rounded-2xl shadow-sm',
           isUser
-            ? "bg-white text-gray-900"
-            : "bg-primary text-primary-foreground"
+            ? 'bg-gray-500/70 rounded-tr-sm'
+            : 'bg-gray-700/70 rounded-tl-sm'
         )}
       >
-        {isUser ? "You" : "A"}
-      </div>
-      <div className="min-h-[20px] whitespace-pre-wrap flex flex-1">
-        <span className="prose dark:prose-invert break-words">
-          {message.content || ''}
-        </span>
+        <div className="flex flex-col gap-2 p-4">
+          <div className={cn('absolute -top-3', isUser ? 'right-0' : 'left-0')}>
+            <div className="h-6 w-6 rounded-full text-white flex items-center justify-center bg-black/75 text-xs">
+              {isUser ? 'U' : 'AI'}
+            </div>
+          </div>
+          <div className="flex-1 overflow-hidden mt-2">
+            <div
+              className={cn(
+                'prose prose-sm md:prose-base w-full break-words dark:prose-invert dark',
+                isUser ? 'pr-2' : 'pl-2'
+              )}
+            >
+              {!isUser && message.content === null ? (
+                <p className="text-gray-400">Error</p>
+              ) : (
+                <div className="whitespace-pre-wrap text-white">
+                  {message.content}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
