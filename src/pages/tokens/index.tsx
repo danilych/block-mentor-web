@@ -1,88 +1,77 @@
-import { useState, useEffect } from "react";
-import { Input } from "../../components/ui/input";
-import {useWallets} from '@privy-io/react-auth';
-import { formatEther } from "ethers";
-import { ChevronDown, ChevronUp, CircleX } from "lucide-react";
-import { API_BASE_URL } from "@/config";
-
-interface Token {
-  name: string;
-  symbol: string;
-  createdAt: string;
-  initialSupply: string;
-  contractAddress: string;
-} 
-
-interface ApiToken {
-  id: string;
-  blockTimestamp: string;
-  initialAmount: string;
-  name: string;
-  ticker: string;
-  owner: string;
-  token_address: string;
-}
+import { useState, useEffect } from 'react'
+import { Input } from '../../components/ui/input'
+import { useWallets } from '@privy-io/react-auth'
+import { formatEther } from 'ethers'
+import { ChevronDown, ChevronUp, CircleX } from 'lucide-react'
+import { API_BASE_URL } from '@/config'
+import { Token } from '@/types/index'
+import { ApiToken } from '@/types/api'
 
 const TokensPage = () => {
-  const { wallets } = useWallets();
-  console.log({wallets});
-  const embeddedWallet = wallets?.[0];
-  const [tokens, setTokens] = useState<Token[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const { wallets } = useWallets()
+  console.log({ wallets })
+  const embeddedWallet = wallets?.[0]
+  const [tokens, setTokens] = useState<Token[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [expandedRow, setExpandedRow] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchTokens = async () => {
       if (!embeddedWallet?.address) {
-        setError("Please connect your wallet first");
-        return;
+        setError('Please connect your wallet first')
+        return
       }
-      
-      setIsLoading(true);
-      setError(null);
+
+      setIsLoading(true)
+      setError(null)
       try {
-        const response = await fetch(`${API_BASE_URL}/user/tokens/${embeddedWallet.address}`);
-        if(response.status === 404) {
-          setTokens([]);
-          return;
+        const response = await fetch(
+          `${API_BASE_URL}/user/tokens/${embeddedWallet.address}`
+        )
+        if (response.status === 404) {
+          setTokens([])
+          return
         }
         if (!response.ok) {
-          throw new Error('Failed to fetch tokens');
+          throw new Error('Failed to fetch tokens')
         }
-        const apiData: ApiToken[] = await response.json();
+        const apiData: ApiToken[] = await response.json()
         const formattedTokens: Token[] = apiData.map(token => ({
           name: token.name,
           symbol: token.ticker,
-          createdAt: new Date(parseInt(token.blockTimestamp) * 1000).toLocaleDateString(),
+          createdAt: new Date(
+            parseInt(token.blockTimestamp) * 1000
+          ).toLocaleDateString(),
           initialSupply: formatEther(token.initialAmount).replace(/\.0+$/, ''),
-          contractAddress: token.token_address
-        }));
-        setTokens(formattedTokens);
+          contractAddress: token.token_address,
+        }))
+        setTokens(formattedTokens)
       } catch (error) {
-        console.error('Error fetching tokens:', error);
-        setError("Failed to fetch tokens. Please try again later.");
+        console.error('Error fetching tokens:', error)
+        setError('Failed to fetch tokens. Please try again later.')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchTokens();
-  }, [embeddedWallet?.address]);
+    fetchTokens()
+  }, [embeddedWallet?.address])
 
-  const filteredTokens = tokens.filter(token => 
-    token.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    token.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    token.contractAddress.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredTokens = tokens.filter(
+    token =>
+      token.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      token.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      token.contractAddress.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   if (isLoading) {
     return (
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-lg">Loading tokens...</div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -90,7 +79,7 @@ const TokensPage = () => {
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-lg text-red-500">{error}</div>
       </div>
-    );
+    )
   }
 
   if (tokens.length === 0 && !error) {
@@ -101,12 +90,14 @@ const TokensPage = () => {
         </div>
         <div className="flex flex-col items-center justify-center gap-4 p-8 border rounded-lg bg-gray-50 dark:bg-gray-800">
           <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
-          <CircleX />
+            <CircleX />
           </div>
-          <div className="text-xl font-semibold text-center">No tokens found</div>
+          <div className="text-xl font-semibold text-center">
+            No tokens found
+          </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -118,7 +109,7 @@ const TokensPage = () => {
             type="text"
             placeholder="Search by name, symbol, or address..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="w-full"
           />
         </div>
@@ -129,26 +120,43 @@ const TokensPage = () => {
           <table className="w-full text-sm text-left table-fixed min-w-[350px]">
             <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th scope="col" className="px-4 md:px-6 py-3 w-[45%]">Token</th>
-                <th scope="col" className="px-4 md:px-6 py-3 w-[40%]">Contract Address</th>
-                <th scope="col" className="px-4 md:px-6 py-3 w-[15%] min-w-[60px]"></th>
+                <th scope="col" className="px-4 md:px-6 py-3 w-[45%]">
+                  Token
+                </th>
+                <th scope="col" className="px-4 md:px-6 py-3 w-[40%]">
+                  Contract Address
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 md:px-6 py-3 w-[15%] min-w-[60px]"
+                ></th>
               </tr>
             </thead>
             <tbody>
               {filteredTokens.length > 0 ? (
-                filteredTokens.map((token) => (
+                filteredTokens.map(token => (
                   <>
-                    <tr 
-                      key={token.contractAddress} 
-                      onClick={() => setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress)}
+                    <tr
+                      key={token.contractAddress}
+                      onClick={() =>
+                        setExpandedRow(
+                          expandedRow === token.contractAddress
+                            ? null
+                            : token.contractAddress
+                        )
+                      }
                       className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
                     >
                       <td className="px-4 md:px-6 py-4 min-w-0">
                         <div className="flex items-center space-x-2">
                           <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-200 rounded-full flex-shrink-0"></div>
                           <div className="min-w-0">
-                            <div className="font-medium truncate">{token.name}</div>
-                            <div className="text-gray-500 truncate">{token.symbol}</div>
+                            <div className="font-medium truncate">
+                              {token.name}
+                            </div>
+                            <div className="text-gray-500 truncate">
+                              {token.symbol}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -159,12 +167,20 @@ const TokensPage = () => {
                       </td>
                       <td className="px-4 md:px-6 py-4 text-right">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedRow(expandedRow === token.contractAddress ? null : token.contractAddress);
+                          onClick={e => {
+                            e.stopPropagation()
+                            setExpandedRow(
+                              expandedRow === token.contractAddress
+                                ? null
+                                : token.contractAddress
+                            )
                           }}
                           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded inline-flex"
-                          aria-label={expandedRow === token.contractAddress ? "Collapse" : "Expand"}
+                          aria-label={
+                            expandedRow === token.contractAddress
+                              ? 'Collapse'
+                              : 'Expand'
+                          }
                         >
                           {expandedRow === token.contractAddress ? (
                             <ChevronUp className="w-4 h-4" />
@@ -179,11 +195,15 @@ const TokensPage = () => {
                         <td colSpan={3} className="px-4 md:px-6 py-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <div className="text-sm font-medium text-gray-500">Created At</div>
+                              <div className="text-sm font-medium text-gray-500">
+                                Created At
+                              </div>
                               <div className="mt-1">{token.createdAt}</div>
                             </div>
                             <div>
-                              <div className="text-sm font-medium text-gray-500">Initial Supply</div>
+                              <div className="text-sm font-medium text-gray-500">
+                                Initial Supply
+                              </div>
                               <div className="mt-1">{token.initialSupply}</div>
                             </div>
                           </div>
@@ -204,7 +224,7 @@ const TokensPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TokensPage;
+export default TokensPage

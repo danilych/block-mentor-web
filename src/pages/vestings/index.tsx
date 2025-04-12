@@ -4,34 +4,8 @@ import { useWallets } from '@privy-io/react-auth'
 import { ChevronDown, ChevronUp, CircleX, ExternalLink } from 'lucide-react'
 import { API_BASE_URL } from '@/config'
 import { getVestingeUrl } from '@/config/constants'
-
-interface Vesting {
-  id: string
-  tokenName: string
-  tokenSymbol: string
-  amount: string
-  totalPeriods: string
-  periodDuration: string
-  startTimestamp: string
-  createdAt: string
-  tokenAddress: string
-  owner: string
-  webpage?: string
-}
-
-interface ApiVesting {
-  id: string
-  blockTimestamp: string
-  token_name: string
-  token_ticker: string
-  amount: string
-  total_periods: string
-  period_duration: string
-  start_timestamp: string
-  token_address: string
-  owner: string
-  webpage?: string
-}
+import { ApiVesting } from '@/types/api'
+import { Vesting } from '@/types'
 
 const VestingsPage = () => {
   const { wallets } = useWallets()

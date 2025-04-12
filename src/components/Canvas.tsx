@@ -1,28 +1,5 @@
 import React, { useEffect, useRef } from "react";
-
-interface ParticleOptions {
-  particleColor: string;
-  lineColor: string;
-  particleAmount: number;
-  defaultRadius: number;
-  variantRadius: number;
-  defaultSpeed: number;
-  variantSpeed: number;
-  linkRadius: number;
-}
-
-interface Particle {
-  x: number;
-  y: number;
-  color: string;
-  radius: number;
-  speed: number;
-  directionAngle: number;
-  vector: { x: number; y: number };
-  update: () => void;
-  border: () => void;
-  draw: () => void;
-}
+import { ParticleOptions, Particle } from "@/types/index";
 
 const ParticleEffect: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

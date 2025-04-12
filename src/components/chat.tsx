@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import Message from '@/components/message'
 import { Button } from '@/components/ui/button'
-import { EChatMessageRole, TChatMessage } from '@/types/aiChats'
 import { usePrivy } from '@privy-io/react-auth'
 import $client from '@/service/client'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { API_BASE_URL } from '@/config'
+import { ChatMessage, ChatMessageRole } from '@/types/index'
 
 const Chat = ({ user }: { user: any }) => {
-  const [messages, setMessages] = useState<TChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const bottomOfChatRef = useRef<HTMLDivElement>(null)
   const [isBotTyping, setIsBotTyping] = useState(false)
   const { getAccessToken } = usePrivy()
@@ -39,11 +39,11 @@ const Chat = ({ user }: { user: any }) => {
 
   async function sendMessage(prompt: string, role: string) {
     const messageId = crypto.randomUUID()
-    if(textareaRef.current) textareaRef.current.value = ''
+    if (textareaRef.current) textareaRef.current.value = ''
     if (!prompt.length) return
 
-    const userMessage: TChatMessage = {
-      role: EChatMessageRole.USER,
+    const userMessage: ChatMessage = {
+      role: ChatMessageRole.USER,
       content: prompt,
       id: messageId,
     }
@@ -74,8 +74,8 @@ const Chat = ({ user }: { user: any }) => {
       const decoder = new TextDecoder()
       let resultString = ''
 
-      const aiMessage: TChatMessage = {
-        role: EChatMessageRole.AI,
+      const aiMessage: ChatMessage = {
+        role: ChatMessageRole.AI,
         content: '',
         id: crypto.randomUUID(),
       }
@@ -104,7 +104,7 @@ const Chat = ({ user }: { user: any }) => {
         })
 
         // Update AI message content **incrementally**
-        setMessages((prevMessages: TChatMessage[]) =>
+        setMessages((prevMessages: ChatMessage[]) =>
           prevMessages.map(msg =>
             msg.id === aiMessage.id
               ? {
@@ -132,15 +132,15 @@ const Chat = ({ user }: { user: any }) => {
 
   const handleKeypress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      sendMessage(textareaRef.current?.value || '', EChatMessageRole.USER)
+      sendMessage(textareaRef.current?.value || '', ChatMessageRole.USER)
     }
   }
 
   const handleTextareaInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const textarea = e.target;
-    textarea.style.height = '24px';
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  };
+    const textarea = e.target
+    textarea.style.height = '24px'
+    textarea.style.height = `${textarea.scrollHeight}px`
+  }
 
   return (
     <div className="flex max-w-full flex-1 flex-col">
@@ -151,7 +151,7 @@ const Chat = ({ user }: { user: any }) => {
               <div className="react-scroll-to-bottom--css-ikyem-1n7m0yu">
                 {messages && messages.length > 0 ? (
                   <div className="flex flex-col items-center text-sm">
-                    {messages.map((msg: TChatMessage) => (
+                    {messages.map((msg: ChatMessage) => (
                       <Message key={msg.id} message={msg} />
                     ))}
                     <div className="w-full h-32 md:h-48 flex-shrink-0"></div>
@@ -191,7 +191,7 @@ const Chat = ({ user }: { user: any }) => {
                   onClick={() =>
                     sendMessage(
                       textareaRef.current?.value || '',
-                      EChatMessageRole.USER
+                      ChatMessageRole.USER
                     )
                   }
                   className="absolute p-1 rounded-md bottom-0 md:bottom-2 bg-neutral-500 dark:bg-white disabled:bg-gray-500 right-1 md:right-2 disabled:opacity-40"
