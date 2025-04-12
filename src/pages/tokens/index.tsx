@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Input } from '../../components/ui/input'
+import { Input } from '@/components/ui/input'
 import { useWallets } from '@privy-io/react-auth'
 import { formatEther } from 'ethers'
 import { ChevronDown, ChevronUp, CircleX } from 'lucide-react'

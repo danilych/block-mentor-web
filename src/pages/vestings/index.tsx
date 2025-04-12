@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Input } from '../../components/ui/input'
+import { Input } from '@/components/ui/input'
 import { useWallets } from '@privy-io/react-auth'
 import { ChevronDown, ChevronUp, CircleX, ExternalLink } from 'lucide-react'
 import { API_BASE_URL } from '@/config'
