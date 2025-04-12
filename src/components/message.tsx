@@ -1,7 +1,3 @@
-// import { SiOpenai } from "react-icons/si";
-// import { HiUser } from "react-icons/hi";
-// import { TbCursorText } from "react-icons/tb";
-
 import { ChatMessageRole } from '@/types/index'
 import { MessageProps } from '@/types/index'
 
