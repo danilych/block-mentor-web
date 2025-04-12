@@ -1,14 +1,15 @@
+import { getAccessToken } from '@privy-io/react-auth'
 import apiClient from './apiClient'
 import { ChatMessage } from '@/types'
 
 export const chatService = {
-  getOrCreateChat: async (): Promise<{messages: ChatMessage[]}> => {
-    const { data } = await apiClient.get<{messages: ChatMessage[]}>('/chats')
+  getOrCreateChat: async (): Promise<{ messages: ChatMessage[] }> => {
+    const { data } = await apiClient.get<{ messages: ChatMessage[] }>('/chats')
     return data
   },
 
   sendMessage: async (content: string, role: string): Promise<Response> => {
-    const token = await (window as any).privyGetAccessToken?.() || ''
+    const token = (await getAccessToken()) || ''
     const response = await fetch(`${apiClient.defaults.baseURL}/messages`, {
       method: 'POST',
       headers: {
@@ -26,7 +27,7 @@ export const chatService = {
     }
 
     return response
-  }
+  },
 }
 
 export default chatService
