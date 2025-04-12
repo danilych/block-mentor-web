@@ -1,156 +1,141 @@
-import { useEffect, useRef, useState } from 'react'
-import { ParticleOptions, Particle } from '@/types'
+import React, { useEffect, useRef } from 'react'
+import { ParticleOptions, Particle } from '@/types/index'
 
-function ParticleEffect() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
-  const [particles, setParticles] = useState<Particle[]>([])
-  const [width, setWidth] = useState(0)
-  const [height, setHeight] = useState(0)
-
-  const particleOptions: ParticleOptions = {
-    particleColor: '#fff',
-    lineColor: 'rgba(255, 255, 255, 0.1)',
-    particleAmount: 30,
-    defaultRadius: 2,
-    variantRadius: 2,
-    defaultSpeed: 1,
-    variantSpeed: 1,
-    linkRadius: 220,
-  }
+const ParticleEffect: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    if (canvasRef.current) {
-      setWidth(window.innerWidth)
-      setHeight(window.innerHeight)
-      const ctx = canvasRef.current.getContext('2d')
-      setContext(ctx)
+    const options: ParticleOptions = {
+      particleColor: 'rgba(255,255,255)',
+      lineColor: 'rgba(0,181,255)',
+      particleAmount: 60,
+      defaultRadius: 1,
+      variantRadius: 1,
+      defaultSpeed: 1,
+      variantSpeed: 1,
+      linkRadius: 300,
     }
 
-    const handleResize = () => {
-      setWidth(window.innerWidth)
-      setHeight(window.innerHeight)
-    }
+    const particles: Particle[] = []
+    const loopIds: number[] = []
 
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    function initCanvas(
+      canvas: HTMLCanvasElement,
+      ctx: CanvasRenderingContext2D
+    ) {
+      const w = (canvas.width = window.innerWidth)
+      const h = (canvas.height = window.innerHeight)
 
-  const createParticle = (ctx: CanvasRenderingContext2D): Particle => {
-    let x = Math.random() * width
-    let y = Math.random() * height
-    const color = particleOptions.particleColor
-    const radius =
-      particleOptions.defaultRadius +
-      Math.random() * particleOptions.variantRadius
-    const speed =
-      particleOptions.defaultSpeed +
-      Math.random() * particleOptions.variantSpeed
-    const directionAngle = Math.PI * 2 * Math.random()
-
-    const vector = {
-      x: Math.cos(directionAngle) * speed,
-      y: Math.sin(directionAngle) * speed,
-    }
-
-    const update = () => {
-      x += vector.x
-      y += vector.y
-    }
-
-    const border = () => {
-      if (x >= width || x <= 0) {
-        vector.x *= -1
+      function resizeReset() {
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
       }
-      if (y >= height || y <= 0) {
-        vector.y *= -1
+
+      function initialiseParticles() {
+        particles.length = 0 // Clear previous particles
+        for (let i = 0; i < options.particleAmount; i++) {
+          particles.push(createParticle(w, h))
+        }
       }
-      if (x > width) x = width
-      if (y > height) y = height
-      if (x < 0) x = 0
-      if (y < 0) y = 0
-    }
 
-    const draw = () => {
-      ctx.beginPath()
-      ctx.arc(x, y, radius, 0, Math.PI * 2)
-      ctx.closePath()
-      ctx.fillStyle = color
-      ctx.fill()
-    }
+      function createParticle(w: number, h: number): Particle {
+        const angle = Math.random() * 360 // Random angle in degrees
+        const radians = angle * (Math.PI / 180) // Convert to radians
 
-    return {
-      x,
-      y,
-      color,
-      radius,
-      speed,
-      directionAngle,
-      vector,
-      update,
-      border,
-      draw,
-    }
-  }
-
-  useEffect(() => {
-    if (context && width && height) {
-      const newParticles: Particle[] = []
-      for (let i = 0; i < particleOptions.particleAmount; i++) {
-        newParticles.push(createParticle(context))
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          color: options.particleColor,
+          radius: options.defaultRadius + Math.random() * options.variantRadius,
+          speed: options.defaultSpeed + Math.random() * options.variantSpeed,
+          directionAngle: angle,
+          vector: {
+            x:
+              Math.cos(radians) *
+              (options.defaultSpeed + Math.random() * options.variantSpeed),
+            y:
+              Math.sin(radians) *
+              (options.defaultSpeed + Math.random() * options.variantSpeed),
+          },
+          update() {
+            this.border()
+            this.x += this.vector.x
+            this.y += this.vector.y
+          },
+          border() {
+            if (this.x >= w || this.x <= 0) this.vector.x *= -1
+            if (this.y >= h || this.y <= 0) this.vector.y *= -1
+            if (this.x > w) this.x = w
+            if (this.y > h) this.y = h
+            if (this.x < 0) this.x = 0
+            if (this.y < 0) this.y = 0
+          },
+          draw() {
+            ctx.beginPath()
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
+            ctx.closePath()
+            ctx.fillStyle = this.color
+            ctx.fill()
+          },
+        }
       }
-      setParticles(newParticles)
-    }
-  }, [context, width, height])
 
-  useEffect(() => {
-    let animationFrameId: number
-
-    const animate = () => {
-      if (context && width && height) {
-        context.clearRect(0, 0, width, height)
-
-        particles.forEach(particle => {
-          particle.update()
-          particle.border()
-          particle.draw()
-        })
-
+      function drawLine() {
+        const rgb = options.lineColor.match(/\d+/g) || ['0', '0', '0']
         for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x
-            const dy = particles[i].y - particles[j].y
-            const distance = Math.sqrt(dx * dx + dy * dy)
-
-            if (distance < particleOptions.linkRadius) {
-              context.beginPath()
-              context.moveTo(particles[i].x, particles[i].y)
-              context.lineTo(particles[j].x, particles[j].y)
-              context.strokeStyle = particleOptions.lineColor
-              context.lineWidth = 0.5
-              context.stroke()
-              context.closePath()
+          for (let j = 0; j < particles.length; j++) {
+            const distance = checkDistance(particles[i], particles[j])
+            const opacity = 1 - distance / options.linkRadius
+            if (opacity > 0) {
+              ctx.lineWidth = 0.5
+              ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${opacity})`
+              ctx.beginPath()
+              ctx.moveTo(particles[i].x, particles[i].y)
+              ctx.lineTo(particles[j].x, particles[j].y)
+              ctx.closePath()
+              ctx.stroke()
             }
           }
         }
+      }
 
-        animationFrameId = window.requestAnimationFrame(animate)
+      function checkDistance(p1: Particle, p2: Particle): number {
+        return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
+      }
+
+      function animationLoop() {
+        ctx.clearRect(0, 0, w, h)
+        drawLine()
+        particles.forEach(particle => {
+          particle.update()
+          particle.draw()
+        })
+        loopIds.forEach(id => cancelAnimationFrame(id))
+        loopIds.push(requestAnimationFrame(animationLoop))
+      }
+
+      window.addEventListener('resize', resizeReset)
+      initialiseParticles()
+      animationLoop()
+    }
+
+    if (canvasRef.current) {
+      const canvas = canvasRef.current
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        initCanvas(canvas, ctx)
       }
     }
 
-    animate()
-
     return () => {
-      window.cancelAnimationFrame(animationFrameId)
+      loopIds.forEach(id => cancelAnimationFrame(id))
     }
-  }, [context, particles, width, height])
+  }, [])
 
   return (
     <canvas
       ref={canvasRef}
-      width={width}
-      height={height}
-      className="absolute top-0 left-0 w-full h-full -z-10"
+      className="fixed bg-neutral-800 blur-[2px] scale-125 inset-0 z-[-10]"
     />
   )
 }

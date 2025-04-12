@@ -17,7 +17,7 @@ const App = () => {
 
   const handleGetOrCreateUser = async () => {
     await authenticate()
-    
+
     if (user) {
       delegateWallet({
         address: user.user.wallet,
