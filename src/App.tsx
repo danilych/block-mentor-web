@@ -12,7 +12,7 @@ import { useHeadlessDelegatedActions } from '@privy-io/react-auth'
 
 const App = () => {
   const [user, setUser] = useState(null)
-  const { authenticated, ready, user: privyUser } = usePrivy()
+  const { authenticated, user: privyUser } = usePrivy()
   const { delegateWallet } = useHeadlessDelegatedActions()
 
   const handleGetOrCreateUser = async () => {
