@@ -11,7 +11,7 @@ interface TokenState {
   reset: () => void
 }
 
-const useTokenStore = create<TokenState>((set) => ({
+const useTokenStore = create<TokenState>(set => ({
   tokens: [],
   isLoading: false,
   error: null,
@@ -19,9 +19,9 @@ const useTokenStore = create<TokenState>((set) => ({
   fetchTokens: async (walletAddress: string) => {
     try {
       set({ isLoading: true, error: null })
-      
+
       const apiTokens = await tokenService.getTokens(walletAddress)
-      
+
       const formattedTokens: Token[] = apiTokens.map(token => ({
         name: token.name,
         symbol: token.ticker,
@@ -31,20 +31,20 @@ const useTokenStore = create<TokenState>((set) => ({
         initialSupply: formatEther(token.initialAmount).replace(/\.0+$/, ''),
         contractAddress: token.token_address,
       }))
-      
+
       set({ tokens: formattedTokens, isLoading: false })
     } catch (error: any) {
       console.error('Error fetching tokens:', error)
-      set({ 
-        error: error.message || 'Failed to fetch tokens', 
-        isLoading: false 
+      set({
+        error: error.message || 'Failed to fetch tokens',
+        isLoading: false,
       })
     }
   },
 
   reset: () => {
     set({ tokens: [], error: null, isLoading: false })
-  }
+  },
 }))
 
 export default useTokenStore

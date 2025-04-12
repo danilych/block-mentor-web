@@ -10,7 +10,7 @@ interface VestingState {
   reset: () => void
 }
 
-const useVestingStore = create<VestingState>((set) => ({
+const useVestingStore = create<VestingState>(set => ({
   vestings: [],
   isLoading: false,
   error: null,
@@ -18,9 +18,9 @@ const useVestingStore = create<VestingState>((set) => ({
   fetchVestings: async (walletAddress: string) => {
     try {
       set({ isLoading: true, error: null })
-      
+
       const apiVestings = await vestingService.getVestings(walletAddress)
-      
+
       const formattedVestings: Vesting[] = apiVestings.map(vesting => ({
         id: vesting.id,
         tokenName: vesting.token_name,
@@ -34,22 +34,22 @@ const useVestingStore = create<VestingState>((set) => ({
         ).toLocaleDateString(),
         tokenAddress: vesting.token_address,
         owner: vesting.owner,
-        webpage: vesting.webpage
+        webpage: vesting.webpage,
       }))
-      
+
       set({ vestings: formattedVestings, isLoading: false })
     } catch (error: any) {
       console.error('Error fetching vestings:', error)
-      set({ 
-        error: error.message || 'Failed to fetch vestings', 
-        isLoading: false 
+      set({
+        error: error.message || 'Failed to fetch vestings',
+        isLoading: false,
       })
     }
   },
 
   reset: () => {
     set({ vestings: [], error: null, isLoading: false })
-  }
+  },
 }))
 
 export default useVestingStore

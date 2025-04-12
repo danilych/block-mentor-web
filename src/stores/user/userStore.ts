@@ -10,7 +10,7 @@ interface UserState {
   reset: () => void
 }
 
-const useUserStore = create<UserState>((set) => ({
+const useUserStore = create<UserState>(set => ({
   user: null,
   isLoading: false,
   error: null,
@@ -22,16 +22,16 @@ const useUserStore = create<UserState>((set) => ({
       set({ user: userData, isLoading: false })
     } catch (error: any) {
       console.error('Authentication error:', error)
-      set({ 
-        error: error.message || 'Failed to authenticate', 
-        isLoading: false 
+      set({
+        error: error.message || 'Failed to authenticate',
+        isLoading: false,
       })
     }
   },
 
   reset: () => {
     set({ user: null, error: null, isLoading: false })
-  }
+  },
 }))
 
 export default useUserStore
