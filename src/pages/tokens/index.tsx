@@ -9,7 +9,6 @@ import { ApiToken } from '@/types/api'
 
 const TokensPage = () => {
   const { wallets } = useWallets()
-  console.log({ wallets })
   const embeddedWallet = wallets?.[0]
   const [tokens, setTokens] = useState<Token[]>([])
   const [searchTerm, setSearchTerm] = useState('')
