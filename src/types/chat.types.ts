@@ -1,26 +1,33 @@
-export enum EChatMessageRole {
+export enum ChatMessageRole {
   USER = 'user',
   AI = 'assistant',
   SYSTEM = 'system',
 }
 
-export type TChatMessage = {
+export type ChatMessage = {
   content: string
-  role: EChatMessageRole
+  role: ChatMessageRole
   id: string
   createdAt?: number
   chunks?: string[]
 }
 
-export type TAiChat = {
+export type AiChat = {
   id: string
   title: string
-  messages: TChatMessage[]
+  messages: ChatMessage[]
   agentId: string
 }
 
 export type AiChatsState = {
-  selectedChat: TAiChat | null
+  selectedChat: AiChat | null
   isBotTyping: boolean
   showEmptyChat: boolean
+}
+
+export interface MessageProps {
+  message: {
+    role: string
+    content: string | null
+  }
 }

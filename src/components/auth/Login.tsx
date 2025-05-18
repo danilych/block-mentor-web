@@ -1,10 +1,11 @@
 import { usePrivy, useLogin } from '@privy-io/react-auth'
 import { Button } from '@/components/ui/button'
-import $client from '@/service/client'
+import { authService } from '@/services/api'
+
 
 function Login() {
   const register = async () => {
-    await $client.post('/auth')
+    await authService.authenticate()
   }
 
   const { ready } = usePrivy()
@@ -17,8 +18,9 @@ function Login() {
   }
 
   if (!ready) {
-    return <div>Loading...</div>
+    return <div className="flex justify-center items-center">Loading...</div>
   }
+  
   return (
     <div className="flex flex-col items-center justify-center">
       <h2 className="scroll-m-20 text-white pb-2 text-3xl font-semibold tracking-tight first:mt-0">

@@ -1,19 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
-import Message from '@/components/message'
+import { useEffect, useRef } from 'react'
+import Message from './Message'
 import { Button } from '@/components/ui/button'
-import { EChatMessageRole, TChatMessage } from '@/types/aiChats'
 import { usePrivy } from '@privy-io/react-auth'
-import $client from '@/service/client'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { API_BASE_URL } from '@/config'
+import { ChatMessageRole } from '@/types'
+import { useChatStore, useUserStore } from '@/stores'
 
-const Chat = ({ user }: { user: any }) => {
-  const [messages, setMessages] = useState<TChatMessage[]>([])
+const ChatInterface = () => {
+  const { messages, isBotTyping, sendMessage, getOrCreateChat } = useChatStore()
+  const { user } = useUserStore()
   const bottomOfChatRef = useRef<HTMLDivElement>(null)
-  const [isBotTyping, setIsBotTyping] = useState(false)
-  const { getAccessToken } = usePrivy()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-
   const { authenticated } = usePrivy()
 
   useEffect(() => {
@@ -21,126 +18,29 @@ const Chat = ({ user }: { user: any }) => {
       bottomOfChatRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages])
-  async function getOrCreateChat() {
-    try {
-      const res = await $client.get('/chats')
-      setMessages(res.data.messages)
-    } catch (error) {
-      console.error('Error getting or creating chat:', error)
-      return null
-    }
-  }
-
+  
   useEffect(() => {
     if (authenticated && user) {
       getOrCreateChat()
     }
-  }, [authenticated, user])
-
-  async function sendMessage(prompt: string, role: string) {
-    const messageId = crypto.randomUUID()
-    if(textareaRef.current) textareaRef.current.value = ''
-    if (!prompt.length) return
-
-    const userMessage: TChatMessage = {
-      role: EChatMessageRole.USER,
-      content: prompt,
-      id: messageId,
-    }
-
-    // Set user message immediately
-    setMessages(prev => [...prev, userMessage])
-
-    setIsBotTyping(true)
-    try {
-      const token = await getAccessToken()
-      const response = await fetch(`${API_BASE_URL}/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          content: prompt,
-          role: role,
-        }),
-      })
-
-      if (!response.ok || !response.body) {
-        throw new Error('Failed to send message')
-      }
-
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let resultString = ''
-
-      const aiMessage: TChatMessage = {
-        role: EChatMessageRole.AI,
-        content: '',
-        id: crypto.randomUUID(),
-      }
-
-      let previousChunk = ''
-
-      // Add AI message to chat
-      setMessages(prev => [...prev, aiMessage])
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const messageChunk = decoder.decode(value, { stream: true })
-        const cleanedMessages = messageChunk.split('')
-
-        cleanedMessages.forEach(chunk => {
-          if (
-            previousChunk &&
-            (previousChunk.match(/[a-zA-Z0-9]$/) || chunk.match(/^[a-zA-Z0-9]/))
-          ) {
-            resultString += '' + chunk
-          } else {
-            resultString += chunk
-          }
-          previousChunk = chunk
-        })
-
-        // Update AI message content **incrementally**
-        setMessages((prevMessages: TChatMessage[]) =>
-          prevMessages.map(msg =>
-            msg.id === aiMessage.id
-              ? {
-                  ...msg,
-                  content: resultString,
-                  chunks: [...(msg.chunks || []), ...cleanedMessages],
-                }
-              : msg
-          )
-        )
-      }
-      setIsBotTyping(false)
-      return response
-    } catch (error) {
-      setIsBotTyping(false)
-
-      if (error instanceof Error) {
-        if (error.message.includes('ThrottlerException')) {
-          return
-        }
-        console.error('Error while send message: ', error.message)
-      }
-    }
-  }
+  }, [authenticated, user, getOrCreateChat])
 
   const handleKeypress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      sendMessage(textareaRef.current?.value || '', EChatMessageRole.USER)
+      e.preventDefault();
+      const content = textareaRef.current?.value || '';
+      if (content.trim()) {
+        sendMessage(content, ChatMessageRole.USER);
+        if (textareaRef.current) textareaRef.current.value = '';
+      }
     }
   }
 
   const handleTextareaInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const textarea = e.target;
-    textarea.style.height = '24px';
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  };
+    const textarea = e.target
+    textarea.style.height = '24px'
+    textarea.style.height = `${textarea.scrollHeight}px`
+  }
 
   return (
     <div className="flex max-w-full flex-1 flex-col">
@@ -151,7 +51,7 @@ const Chat = ({ user }: { user: any }) => {
               <div className="react-scroll-to-bottom--css-ikyem-1n7m0yu">
                 {messages && messages.length > 0 ? (
                   <div className="flex flex-col items-center text-sm">
-                    {messages.map((msg: TChatMessage) => (
+                    {messages.map((msg) => (
                       <Message key={msg.id} message={msg} />
                     ))}
                     <div className="w-full h-32 md:h-48 flex-shrink-0"></div>
@@ -162,6 +62,7 @@ const Chat = ({ user }: { user: any }) => {
             </div>
           </ScrollArea>
         </div>
+
         <div className="absolute bottom-0 left-0 w-full border-t md:border-t-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:bg-vert-light-gradient bg-white dark:bg-gray-800 md:!bg-transparent dark:md:bg-vert-dark-gradient pt-2">
           <div className="stretch mx-2 flex flex-row gap-3 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
             <div className="relative flex h-full flex-1 flex-col">
@@ -171,6 +72,7 @@ const Chat = ({ user }: { user: any }) => {
                     Assistant is typing...
                   </div>
                 )}
+                
                 <textarea
                   disabled={isBotTyping}
                   ref={textareaRef}
@@ -186,14 +88,16 @@ const Chat = ({ user }: { user: any }) => {
                   onKeyDown={handleKeypress}
                   onInput={handleTextareaInput}
                 />
+                
                 <Button
                   disabled={isBotTyping}
-                  onClick={() =>
-                    sendMessage(
-                      textareaRef.current?.value || '',
-                      EChatMessageRole.USER
-                    )
-                  }
+                  onClick={() => {
+                    const content = textareaRef.current?.value || '';
+                    if (content.trim()) {
+                      sendMessage(content, ChatMessageRole.USER);
+                      if (textareaRef.current) textareaRef.current.value = '';
+                    }
+                  }}
                   className="absolute p-1 rounded-md bottom-0 md:bottom-2 bg-neutral-500 dark:bg-white disabled:bg-gray-500 right-1 md:right-2 disabled:opacity-40"
                 >
                   <p className="p-1">{'>'}</p>
@@ -207,4 +111,4 @@ const Chat = ({ user }: { user: any }) => {
   )
 }
 
-export default Chat
+export default ChatInterface
